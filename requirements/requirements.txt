@@ -1,0 +1,6 @@
+pandas==2.2.2
+openai==1.37.1
+requests==2.32.3
+python-dotenv==1.0.1
+editdistance==0.8.1
+SPARQLWrapper==2.0.0

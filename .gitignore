@@ -3,6 +3,6 @@ __pycache__
 
 # virtual environment
 venv
-env
+.env
 
 # File too long
