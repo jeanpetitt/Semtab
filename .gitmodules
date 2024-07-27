@@ -1,0 +1,3 @@
+[submodule "Semtab/cpa"]
+	path = Semtab/cpa
+	url = https://github.com/jeanpetitt/SemtabCPATask
