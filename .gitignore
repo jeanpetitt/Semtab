@@ -1,0 +1,8 @@
+.vscode
+__pycache__
+
+# virtual environment
+venv
+env
+
+# File too long
