@@ -245,11 +245,25 @@ def is_inInterval(number, L: list):
     return False
 
 # check if object have string value
-def have_string(object:list):
-    for item in object:
-        if isinstance(item, str):
-            if item[0:4].isdigit() and is_inInterval(len(item), [1, 14]) or is_number(item):
-                continue
+def is_date(string):
+    split_slash = len(str(string.split("/")))
+    split_tiret = len(str(string.split("-")))
+    if split_slash == 3 or split_tiret == 3:
+        if is_number(split_tiret[0]) or is_number(split_tiret[0][1:]) or is_number(split_slash[0]):
+            return True
+        return False  
+    
+def have_string(object):
+    if isinstance(object, list):
+        for item in object:
+            if isinstance(item, str):
+                if item.isdigit() or is_date(item) or is_number(item):
+                    continue
+                return True
+    else:
+        if str(object).isdigit() or is_number(str(object) or is_date(str(object))):
+            return False
+        else:
             return True
     return False
 

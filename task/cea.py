@@ -134,14 +134,14 @@ class CEATask:
             This function take two csv file which are almost same and compare the rows of the two files
             in order to create a new file that is same of the csv file 1
         """
-        # _raw_dataset, _target = self.buildDataset(
-        #     header=header,
-        #     col_before_row=col_before_row,
-        #     comma_in_cell=comma_in_cell,
-        #     transpose=transpose,
-        #     is_vertical=is_vertical
-        # )
-        _raw_dataset, _target = self.raw_output_dataset, self.target_file
+        _raw_dataset, _target = self.buildDataset(
+            header=header,
+            col_before_row=col_before_row,
+            comma_in_cell=comma_in_cell,
+            transpose=transpose,
+            is_vertical=is_vertical
+        )
+        # _raw_dataset, _target = self.raw_output_dataset, self.target_file
         csv.field_size_limit(1000000)
         with open(_target, 'r') as file1, open(_raw_dataset, 'r') as file2:
             with open(self.output_dataset, 'w', newline='') as updated_file:
@@ -164,7 +164,7 @@ class CEATask:
                         updated_data.append([ "tab_id", "row_id", "col_id","label", 'context', 'entity'])
                     else:
                         updated_data.append([ "tab_id", "col_id", "row_id","label", 'context'])
-                for row1 in csv1_data[0:split]:
+                for row1 in csv1_data:
                     match_found = False
                     for row2 in csv2_data:
                         if row1[:3] == row2[:3]:
@@ -178,7 +178,7 @@ class CEATask:
                     if match_found == False:
                         print(f"Row {row1} it is not in CSV2")
             
-            print("Comparison completed. Updated CSV2 saved as 'updated_csv2.csv'.")
+            print(f"Comparison completed. Updated CSV2 saved {self.output_dataset}")
 
     def _csv_to_jsonl(self, csv_path, json_path):
         """ 
@@ -207,7 +207,7 @@ class CEATask:
                                 },      
                                 {
                                     "role": "assistant", 
-                                    "content": f"""{{"label":  "{label_list[j]}", "context": "{df['context'][i]}","uri": "{uri}"}}"""
+                                    "content": f"""{{"label":  "{label_list[j]}", "context": {df['context'][i]}, "uri": "{uri}"}}"""
                                 }
                             ]
                         }

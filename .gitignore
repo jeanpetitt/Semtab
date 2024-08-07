@@ -1,8 +1,10 @@
 .vscode
 __pycache__
+.DS_Store
 
 # virtual environment
 venv
 .env
 
 # File too long
+data

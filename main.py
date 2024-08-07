@@ -5,6 +5,7 @@ from evaluation.cta_evaluator import CTA_Evaluator
 from evaluation.ra_evaluator import RA_Evaluator
 from evaluation.td_evaluator import TD_Evaluator
 from evaluation.cpa_evaluator import CPA_Evaluator
+from path_data.push_data_on_hub import push_dataset_to_hub
 
 
 if __name__ == "__main__":
@@ -12,13 +13,14 @@ if __name__ == "__main__":
         print("************************************************************")
         print("************************************************************")
         print("1. make csv dataset")
-        print("2. make json dataset")
-        print("3. Combine json datasets")
-        print("4. Create FinTuning Job ID in openAI")
-        print("5. Make simple inference with model finetuned")
-        print("6. Annotate table with model finetuned")
-        print("7. Evaluate model with semtab metric")
-        print("8. Quit")
+        print("2. push data to hub")
+        print("3. make csv dataset")
+        print("4. Combine json datasets")
+        print("5. Create FinTuning Job ID in openAI")
+        print("6. Make simple inference with model finetuned")
+        print("7. Annotate table with model finetuned")
+        print("8. Evaluate model with semtab metric")
+        print("9. Quit")
         print("************************************************************")
         print("************************************************************")
 
@@ -88,6 +90,13 @@ if __name__ == "__main__":
             # test_td_task_tbiomed_hor._makeDataset(is_train=False)
             print("\n")
         elif choice == "2":
+            dataset = push_dataset_to_hub(
+                val_path="dataset/tbiodiv_dataset.csv", 
+                test_path="dataset/tbiodiv_dataset_test.csv",
+                repo_path="tbiodivHorizontalCEA2024"
+            )
+            print("\n")
+        elif choice == "3":
             """ llm 2024 """
             # cea_task_llm._csv_to_jsonl(
             #     csv_path=cea_dataset_llm,
@@ -146,7 +155,7 @@ if __name__ == "__main__":
             #     json_path=td_dataset_json_tbiomed_hor
             # )
             print("\n")
-        elif choice == "3":
+        elif choice == "4":
             combineJsonFile(
                 path_folder=cea_full_json_path_folder,
                 updated_json_path="train_llm1.jsonl"
@@ -162,7 +171,7 @@ if __name__ == "__main__":
             #     split="val[:10%]"
             # )
             print("\n")
-        elif choice == "4":
+        elif choice == "5":
             gpttuner.fineTuningJobID(
                 training_path="train_table_detection_update.jsonl", 
                 validation_file_path="val_table_detection_update.jsonl"
@@ -172,10 +181,10 @@ if __name__ == "__main__":
             #     # validation_file_path="val_llm1.jsonl"
             # )
             print("\n")
-        elif choice == "5":
+        elif choice == "6":
             inference(model=ra_model_finetuned)
             print("\n")
-        elif choice == "6":
+        elif choice == "7":
             """ CEA TASK"""
             """wikidata 2023"""
 
@@ -290,7 +299,7 @@ if __name__ == "__main__":
             # test_task_a_cellular._annotate(is_entity=True, is_biological=True, split=70000)
             # test_task_a_molecular._annotate(is_entity=True, is_biological=True, split=0)
             print("\n")
-        elif choice == "7":
+        elif choice == "8":
             _client_payload = {}
             """ wikidata """
             # _client_payload["submission_file_path"] = cea_wikidata
@@ -354,7 +363,7 @@ if __name__ == "__main__":
             print(result)
             
             print("\n")
-        elif choice == "8":
+        elif choice == "9":
             print("GoodBye !")
             break
         else:

@@ -1,0 +1,59 @@
+{
+    "os": "Linux-6.5.0-44-generic-x86_64-with-glibc2.35",
+    "python": "3.10.12",
+    "heartbeatAt": "2024-07-28T02:45:52.867984",
+    "startedAt": "2024-07-28T02:45:50.564002",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "<python with no main file>",
+    "codePathLocal": null,
+    "git": {
+        "remote": "https://github.com/jeanpetitt/Semtab.git",
+        "commit": "9c62286a0513ccaf74610f6fd1ee472489ca4b20"
+    },
+    "email": "jeanpetityvelos@gmail.com",
+    "root": "/home/jean_dev/Bureau/Project/SemTab",
+    "host": "dev-HP-EliteBook-840-G3",
+    "username": "jean_dev",
+    "executable": "/home/jean_dev/Bureau/Project/SemTab/venv/bin/python",
+    "cpu_count": 2,
+    "cpu_count_logical": 4,
+    "cpu_freq": {
+        "current": 2800.00075,
+        "min": 400.0,
+        "max": 3000.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2800.003,
+            "min": 400.0,
+            "max": 3000.0
+        },
+        {
+            "current": 2800.005,
+            "min": 400.0,
+            "max": 3000.0
+        },
+        {
+            "current": 2800.019,
+            "min": 400.0,
+            "max": 3000.0
+        },
+        {
+            "current": 2799.991,
+            "min": 400.0,
+            "max": 3000.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 456.8854446411133,
+            "used": 405.9956398010254
+        }
+    },
+    "memory": {
+        "total": 15.37179183959961
+    }
+}

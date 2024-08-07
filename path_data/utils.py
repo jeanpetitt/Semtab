@@ -56,12 +56,12 @@ td_model_finetuned = "ft:gpt-3.5-turbo-0613:tib:annotator-td:9bYhZGqb"
 
 """ ============ LLM Track ==============="""
 #  LLMs dataset semtab 2024
-cea_target_llm = "data/csv/tables/semtab2024/llm/train/gt/cea_gt.csv"
-cea_dataset_table_llm = "data/csv/tables/semtab2024/llm/train/tables"
+cea_target_llm = "data/csv/semtab2024/llm/train/gt/cea_gt.csv"
+cea_dataset_table_llm = "data/csv/semtab2024/llm/train/tables"
 cea_llm = "data/result/cea/annotate/2024/llm/cea_an.csv"
 cea_dataset_llm = "data/result/cea/dataset/2024/llm/update_cea.csv"
-cea_dataset_json_llm = "data/json/app2/2024/llm/train_semtab2024_llm.jsonl"
-cea_llm_target = "data/csv/tables/semtab2024/llm/train/gt/target.csv"
+cea_dataset_json_llm = "data/json/cea/llm/llm_train.json"
+cea_llm_target = "data/csv/semtab2024/llm/train/gt/cea_gt.csv"
 
 """ ============== Acuracy TRack ============"""
 

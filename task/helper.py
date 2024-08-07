@@ -2,6 +2,7 @@ import math
 import random
 import numpy as np
 import pandas as pd
+from .symbolic.api import have_string
 
 random.seed(42)
 # get name of file in cea csv file
@@ -42,20 +43,20 @@ def getAllCellInTableColByBCol(table, is_vertical, comma_in_cell):
                 """" 
                     take 10 elements randomly not nan in the row 
                 """
-                cols_row_not_nan = [x for x in row if not isinstance(x, float) or not math.isnan(x)]
+                cols_row_not_nan = [x for x in row if not isinstance(x, float) or not math.isnan(x) or have_string(x)]
                 # check the comma in the cell
                 if comma_in_cell:
                     cols_row_not_nan = [random.choice(str(x).split(",")) for x in cols_row_not_nan]
                 
                 if is_vertical:
                     # check if row a row contain more than 15 elements
-                    if len(cols_row_not_nan) > 15:
-                        choice_element = random.sample(cols_row_not_nan[1:], k=15)
+                    if len(cols_row_not_nan) > 10:
+                        choice_element = random.sample(cols_row_not_nan[1:], k=10)
                     else:
                         choice_element = cols_row_not_nan[1:]
                 else:
-                    if len(cols_row_not_nan) > 15:
-                        choice_element = random.sample(cols_row_not_nan, k=15)
+                    if len(cols_row_not_nan) > 10:
+                        choice_element = random.sample(cols_row_not_nan, k=10)
                     else:
                         choice_element = cols_row_not_nan
                 list_cell.append([row[cols], choice_element])
@@ -80,7 +81,7 @@ def getAllCellInTableRowByRow(table, comma_in_cell):
                 """ 
                     take the first 10 elements not nan in the row 
                 """
-                cols_row_not_nan = [x for x in row if not isinstance(x, float) or not math.isnan(x)]
+                cols_row_not_nan = [x for x in row if not isinstance(x, float) or not math.isnan(x) or have_string(x)]
                 # if cell have more entity separated by coma take the first element
                 if comma_in_cell == True:
                     cols_row_not_nan = [x.split(",") for x in cols_row_not_nan]
