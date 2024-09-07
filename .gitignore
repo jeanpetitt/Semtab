@@ -7,4 +7,5 @@ venv
 .env
 
 # File too long
-data
+data*
+output*
