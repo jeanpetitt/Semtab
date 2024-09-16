@@ -1,8 +1,9 @@
 import math
-import random
+import random, re
 import numpy as np
 import pandas as pd
-from .symbolic.api import have_string
+from .symbolic.api import is_date, is_number
+from .utils import *
 
 random.seed(42)
 # get name of file in cea csv file
@@ -26,6 +27,7 @@ def getNameCsvFile(path):
     
     return cols_not
 
+
 def getAllCellInTableColByBCol(table, is_vertical, comma_in_cell):
     """_summary_
         
@@ -35,6 +37,7 @@ def getAllCellInTableColByBCol(table, is_vertical, comma_in_cell):
         comma_in_cell (boolean): _Specify if table have a lot of data for a given cell separate by(,)_
     """
     list_cell = []
+    cols_row_not_nan = []
     for cols in table.columns:
         for i, row in table.iterrows():
             if type(row[cols]) == type(np.nan):	
@@ -43,23 +46,38 @@ def getAllCellInTableColByBCol(table, is_vertical, comma_in_cell):
                 """" 
                     take 10 elements randomly not nan in the row 
                 """
-                cols_row_not_nan = [x for x in row if not isinstance(x, float) or not math.isnan(x) or have_string(x)]
+                cols_row_not_nan = [x for x in row if (not isinstance(x, float) and not is_date(str(x)) and not is_number(str(x)) and is_valid_string(str(x)) and not contains_html_tags(str(x)) and not 'http' in str(x))]
                 # check the comma in the cell
                 if comma_in_cell:
-                    cols_row_not_nan = [random.choice(str(x).split(",")) for x in cols_row_not_nan]
+                    # cols_row_not_nan = [random.choice(str(x).split(",")).strip() for x in cols_row_not_nan]
+                    elts = []
+                    for x in cols_row_not_nan:
+                        if is_valid_format(x):
+                            elts.append(x)
+                        else:
+                            elts.append(random.choice(str(x).split(",")).strip())
+                    cols_row_not_nan = elts
+                if is_valid_format(str(row[cols])):
+                    new_rows = row[cols]
+                else:
+                    new_rows = [x for x in str(row[cols]).split(',') if not contains_html_tags(str(x)) and not 'http' in str(x)]
+                if is_vertical:
+                    new_rows = ",".join(new_rows)
+                else:
+                    new_rows = find_element_or_first(new_rows)
                 
                 if is_vertical:
                     # check if row a row contain more than 15 elements
-                    if len(cols_row_not_nan) > 10:
-                        choice_element = random.sample(cols_row_not_nan[1:], k=10)
+                    if len(cols_row_not_nan) > 5:
+                        choice_element = random.sample(cols_row_not_nan[1:], k=5)
                     else:
                         choice_element = cols_row_not_nan[1:]
                 else:
-                    if len(cols_row_not_nan) > 10:
-                        choice_element = random.sample(cols_row_not_nan, k=10)
+                    if len(cols_row_not_nan) > 5:
+                        choice_element = random.sample(cols_row_not_nan[1:], k=5)
                     else:
-                        choice_element = cols_row_not_nan
-                list_cell.append([row[cols], choice_element])
+                        choice_element = cols_row_not_nan[1:]
+                list_cell.append([new_rows, choice_element])
     return list_cell
 
 def getAllCellInTableRowByRow(table, comma_in_cell):
@@ -81,11 +99,23 @@ def getAllCellInTableRowByRow(table, comma_in_cell):
                 """ 
                     take the first 10 elements not nan in the row 
                 """
-                cols_row_not_nan = [x for x in row if not isinstance(x, float) or not math.isnan(x) or have_string(x)]
+                cols_row_not_nan = [x for x in row if (not isinstance(x, float) and is_date(str(x)) and not is_number(str(x)) and is_valid_string(str(x)) and not contains_html_tags(str(x)) and not 'http' in str(x))]
                 # if cell have more entity separated by coma take the first element
-                if comma_in_cell == True:
-                    cols_row_not_nan = [x.split(",") for x in cols_row_not_nan]
-               
+                cols_row_not_nan = [x for x in row if (not isinstance(x, float) and not is_date(str(x)) and not is_number(str(x)) and is_valid_string(str(x)) and not contains_html_tags(str(x)) and not 'http' in str(x))]
+                # check the comma in the cell
+                if comma_in_cell:
+                    # cols_row_not_nan = [random.choice(str(x).split(",")).strip() for x in cols_row_not_nan]
+                    elts = []
+                    for x in cols_row_not_nan:
+                        if is_valid_format(x):
+                            elts.append(x)
+                        else:
+                            elts.append(random.choice(str(x).split(",")).strip())
+                    cols_row_not_nan = elts
+                # if is_valid_format(str(row[cols])):
+                #     new_rows = row[cols]
+                # else:
+                #     new_rows = [x for x in str(row[cols]).split(',') if not contains_html_tags(str(x)) and not 'http' in str(x)]
                 choice_element = cols_row_not_nan[:10]
                 list_cell.append([row[cols], choice_element])
     return list_cell

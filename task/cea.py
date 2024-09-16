@@ -48,7 +48,7 @@ class CEATask:
         header=True,
         col_before_row=True,
         comma_in_cell=False,
-        transpose=True,
+        transpose=False,
         is_vertical=False
     ):
         """_summary_
@@ -155,32 +155,28 @@ class CEATask:
                 updated_data = []
 
                 if col_before_row == True:
-                    if is_train:
-                        updated_data.append([ "tab_id", "col_id", "row_id","label", 'context', 'entity'])
-                    else:
-                        updated_data.append([ "tab_id", "col_id", "row_id","label", 'context'])
+                    updated_data.extend(["tab_id", "col_id", "row_id","label", 'context', 'entity'])
                 else:
-                    if is_train:
-                        updated_data.append([ "tab_id", "row_id", "col_id","label", 'context', 'entity'])
-                    else:
-                        updated_data.append([ "tab_id", "col_id", "row_id","label", 'context'])
-                for row1 in csv1_data:
+                    updated_data.extend(["tab_id", "row_id", "col_id","label", 'context', 'entity'])
+                writer.writerows([updated_data])
+                for row1 in csv1_data[split:]:
                     match_found = False
                     for row2 in csv2_data:
                         if row1[:3] == row2[:3]:
                             match_found = True
                             if is_train:
                                 row2.append(row1[3])
+                            else:
+                                row2.append("NIL")
                             updated_data.append(row2)
-                            writer.writerow(row2) 
-                            print("True")
+                            writer.writerow(row2)
                             break         
                     if match_found == False:
                         print(f"Row {row1} it is not in CSV2")
             
             print(f"Comparison completed. Updated CSV2 saved {self.output_dataset}")
 
-    def _csv_to_jsonl(self, csv_path, json_path):
+    def _csv_to_jsonl(self, csv_path, json_path, is_entity=False):
         """ 
             csv_path: path to csv file
             json_path: path to json file
@@ -189,30 +185,49 @@ class CEATask:
         datas = []
         
         for i in range(len(df['label'])):
-            if df['label'][i].split(","):      
+            if df['label'][i].split(","):     
                 uri_list = df['entity'][i].split(",")
                 label_list = df['label'][i].split(",")
                 j = 0
-                for uri in uri_list:      
-                    datas.append(
-                        {
-                            "messages":  [
-                                {
-                                    "role": "system", 
-                                    "content": "Hi, I'm semantic annotation Agent. What can i do to help you today."
-                                },
-                                {
-                                    "role": "user", 
-                                    "content": f"Please what is wikidata URI of {label_list[j]} entity.\nContext: {df['context'][i]}"
-                                },      
-                                {
-                                    "role": "assistant", 
-                                    "content": f"""{{"label":  "{label_list[j]}", "context": {df['context'][i]}, "uri": "{uri}"}}"""
-                                }
-                            ]
-                        }
-                    )
-                    print(uri_list[j])
+                for uri in uri_list:
+                    if is_entity:
+                        datas.append (
+                            {
+                                "messages":  [
+                                    {
+                                        "role": "system", 
+                                        "content": "Semantic Table Interpretation"
+                                    },
+                                    {
+                                        "role": "user", 
+                                        "content": f"Please What is wikidata URI of {label_list[j]}.\nContext: {[label_list[j]]}",
+                                    },      
+                                    {
+                                        "role": "assistant", 
+                                        "content": f"{{\"entity\": {label_list[j]}, \"context\": {[label_list[j]]}, \"uri\": \"{uri}\"}}"
+                                    }
+                                ]
+                            }
+                        )
+                    else:       
+                        datas.append(
+                            {
+                                "messages":  [
+                                    {
+                                        "role": "system", 
+                                        "content": "Semantic Table Interpretation"
+                                    },
+                                    {
+                                        "role": "user", 
+                                        "content": f"Please What is wikidata URI of {label_list[j]}.\nContext: {eval(df['context'][i])}",
+                                    },      
+                                    {
+                                        "role": "assistant", 
+                                        "content": f"\"entity\": \"{label_list[j]}\", \"context\": \"{eval(df['context'][i])}\", \"uri\": \"{uri}\""
+                                    }
+                                ]
+                            }
+                        )
                     j += 1
             else:
                 print("not split available")
@@ -377,7 +392,7 @@ class CEATask:
     
     def correct_spelling(self, text):
         prompt = f"Don't argument in your answer. Correct the spelling of this text : \"{text}\""
-        model = "gpt-4o"
+        model = "gpt-4o-mini"
         message_input = [{"role": "user", "content": prompt}]
         completion = openai.chat.completions.create(
             model=model,
@@ -429,7 +444,7 @@ class CEATask:
                             # get annotation of the cell
                             uri = []
                             if not comma_in_cell and is_llm:
-                                uri = openUrl(label)
+                                uri = openUrl(str(label).strip(".").strip())
                                 if uri:
                                     result = uri
                                 else:
@@ -447,8 +462,8 @@ class CEATask:
                             elif comma_in_cell:
                                 uri = []
                                 label_list = label.split(',')
-                                if len(label_list) > 4:
-                                    label_list = random.sample(label_list, k=4)
+                                # if len(label_list) > 4:
+                                #     label_list = random.sample(label_list, k=4)
                                 
                                 for elt in label_list:
                                     elt = elt.strip()
@@ -467,8 +482,10 @@ class CEATask:
                                         # check uri
                                         result = self.inference(model_id=model, user_input=user_input)
                                         uri.append(result)
-                                result = self.choose_random_valid_element(uri)
-                                print(f"The best element of this cell is {result}")
+                                # result = self.choose_random_valid_element(uri)
+                                result = ','.join(uri)
+                                print(f"The result of these entities are: {result}")
+                                # print(f"The best element of this cell is {result}")
                             else:
                                 # label = label.split(',')[0] 
                                 

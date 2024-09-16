@@ -1,15 +1,13 @@
 import json
 import multiprocessing
 import re
-import numpy
 import openai
 from .helper import getNameCsvFile
 import csv
 import pandas as pd
 import random,math
 from .symbolic.api import get_properties, check_entity_properties_cpa
-import concurrent.futures
-import time
+from .utils import *
 
 random.seed(42)
 # from symbolic.api import openUrl
@@ -89,7 +87,14 @@ class CPATask:
         result = sorted(result, key=lambda x: x['index'])
 
         return result
-
+    
+    def contains_html_tags(self, text):
+        # Define a regex pattern for HTML tags
+        html_tag_pattern = re.compile(r'<[^>]+>')
+        # Search for the pattern in the input text
+        if html_tag_pattern.search(text):
+            return True
+        return False
     
     def buildDataset(
         self,
@@ -120,6 +125,7 @@ class CPATask:
                 filed += ".csv"
                 if filed.endswith(".csv"):
                     filename = filed.split(".")[0]
+                    print(filename)
                     if not header:
                         _file = pd.read_csv(f"{self.table_path}/{filed}", header=None)
                     else:
@@ -131,9 +137,8 @@ class CPATask:
                     list_row__with_empty_data = []
                     if is_entity:
                         for index, row in _file.iloc[0:].iterrows():
-                            print(row)
                             noNanElemenent = row[1:]
-                            noNanElemenent = [str(x) for x in noNanElemenent if not isinstance(x, float) or not math.isnan(x)]
+                            noNanElemenent = [str(x) for x in noNanElemenent if (not isinstance(x, float) ) and not contains_html_tags(str(x))]
                             """ When file come from entity folder each cell represent column"""
                             _cell_selected = noNanElemenent
                             _cell_selected =  [random.choice(x.split(',')) for x in _cell_selected]
@@ -190,7 +195,7 @@ class CPATask:
                             col += 1
                             
                     else:
-                        print(filename,total_col, len(list_cell_selected))
+                        # print(filename,total_col, len(list_cell_selected))
                         if list_cell_selected:
                             col = 0
                             if not is_horizontal:
@@ -205,8 +210,8 @@ class CPATask:
                                     col += 1
                         else:
                             list_cell_selected = self.process_data(list_row__with_empty_data, is_horizontal=is_horizontal)
-                            if total_col - len(list_cell_selected) > 1:
-                                print(filename, total_col, len(list_cell_selected))
+                            # if total_col - len(list_cell_selected) > 1:
+                            #     print(filename, total_col, len(list_cell_selected))
                             col = 0
                             if not is_horizontal:
                                 total_col = len(list_cell_selected) -1

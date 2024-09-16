@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import openai
 import random,math
+from .utils import *
 
 random.seed(42)
 # from symbolic.api import openUrl
@@ -83,7 +84,7 @@ class RATask:
                     list_cell_selected = []
                     for index, row in _file.iloc[0:].iterrows():
                         noNanElemenent = row[1:]
-                        noNanElemenent = set([str(x) for x in noNanElemenent if not isinstance(x, float) or not math.isnan(x)])
+                        noNanElemenent = set([str(x) for x in noNanElemenent if (not isinstance(x, float) and not is_date(str(x)) and not is_number(str(x)) and is_valid_string(str(x)) and not contains_html_tags(str(x)) and not 'http' in str(x))])
                         # print(noNanElemenent)
                         # noNanElemenent = ','.join(noNanElemenent)
                         # noNanElemenent = noNanElemenent.split(",")

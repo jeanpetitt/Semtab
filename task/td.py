@@ -6,6 +6,7 @@ from .helper import getNameCsvFile
 import re, openai
 from .symbolic.api import openUrl, get_instance_of
 from collections import Counter
+from .utils import *
 
 random.seed(42)
 def get_most_common_element(lst):
@@ -71,7 +72,23 @@ class TDTask:
             return max_returned_tokens
         except AssertionError as e:
             print(e)
-
+    
+    # def is_date(self, string):
+    #     split_slash = len(str(string.split("/")))
+    #     split_tiret = len(str(string.split("-")))
+    #     if split_slash == 3 or split_tiret == 3:
+    #         if self.is_number(split_tiret[0]) or self.is_number(split_tiret[0][1:]) or  self.is_number(split_slash[0]):
+    #             return True
+    #     return False  
+            
+    # def contains_html_tags(self, text):
+    #     # Define a regex pattern for HTML tags
+    #     html_tag_pattern = re.compile(r'<[^>]+>')
+    #     # Search for the pattern in the input text
+    #     if html_tag_pattern.search(text):
+    #         return True
+    #     return False
+    
     def buildDataset(
         self,
         n=5
@@ -115,16 +132,19 @@ class TDTask:
                         # chek each element for coma and apply .split(',')
                         processed_elements = []
                         for elem in selected_elements:
-                            if isinstance(elem, str) and ',' in elem:
+                            if isinstance(elem, str):
                                 # Split and choose one element randomly
                                 split_elements = elem.split(',')
-                                chosen_element = random.choice(split_elements).strip()
-                                if 'http' in str(chosen_element) or '</' in str(chosen_element) or "point(" in str(chosen_element):
-                                    pass
+                                elem = random.choice(split_elements).strip()
+                                if contains_html_tags(elem):
+                                    continue
+                                elif is_date(elem):
+                                    continue
+                                if not is_valid_string(elem) or 'http' in str(elem):
+                                    # print(elem)
+                                    continue
                                 else:
-                                    processed_elements.append(chosen_element)
-                            elif "point(" in str(elem).lower() or "".join(str(elem).split('.')).isdigit() or 'http' in str(elem) or '</' in str(elem) :
-                                continue
+                                    processed_elements.append(elem)
                             else:
                                 processed_elements.append(elem)
                         if processed_elements:
@@ -133,6 +153,7 @@ class TDTask:
                             
                     if not column_selected:
                         column_selected = _file.iloc[0:2, 1:3].dropna().values.tolist()
+                        print("==============true============")
                         
                     max_returned_token = self.compute_max_token(len(str(column_selected)), 0)
                     while not max_returned_token:
@@ -141,9 +162,9 @@ class TDTask:
                         column_selected = eval(column_selected)[-1]
                         if isinstance(column_selected, str) or isinstance(column_selected, int):
                             column_selected = [column_selected]
-                        print(column_selected)
+                        # print(column_selected)
                         prompt_input = str(column_selected)
-                        print(len(prompt_input))
+                        # print(len(prompt_input))
                         max_returned_token = self.compute_max_token(len(prompt_input), 0)
                     if len(column_selected) == 1:
                         writer.writerow([filename, column_selected[0]])
@@ -188,7 +209,8 @@ class TDTask:
                         # print(f"Row {row1} it is in CSV2")
                         break         
                 if match_found == False:
-                    print(f"Row {row1} it is not in CSV2")
+                    # print(f"Row {row1} it is not in CSV2")
+                    pass
             
             with open(self.output_dataset, 'w', newline='') as updated_file:
                 writer = csv.writer(updated_file)
@@ -400,7 +422,7 @@ class TDTask:
                         # get annotation of the column type
                         user_input = f"Please Give the  wikidata URI of of the topic of this table: {table}"                  
                         # Use connectionist approach
-                        result = self.inference(model_id=model, user_input=user_input)                        
+                        result = self.inference(model_id=model, user_input=user_input)                    
                         # add result of annation   
                         data.append(result)
                         updated_cea_data.append(data)
