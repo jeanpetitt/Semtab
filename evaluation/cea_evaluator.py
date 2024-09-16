@@ -12,10 +12,6 @@ class CEA_Evaluator:
         self.round = round
 
     def _evaluate(self, client_payload):
-        """
-        `client_payload` will be a dict with (atleast) the following keys :
-          - submission_file_path : local file path of the submitted file
-        """
         submission_file_path = client_payload["submission_file_path"]
 
         gt_cell_ent = dict()
@@ -52,15 +48,10 @@ class CEA_Evaluator:
         secondary_score = precision
 
         """
-    Do something with your submitted file to come up
-    with a score and a secondary score.
 
     if you want to report back an error to the user,
     then you can simply do :
       `raise Exception("YOUR-CUSTOM-ERROR")`
-
-     You are encouraged to add as many validations as possible
-     to provide meaningful feedback to your users
     """
         _result_object = {
             "F1 score": main_score,

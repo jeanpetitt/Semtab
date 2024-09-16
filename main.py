@@ -91,9 +91,11 @@ if __name__ == "__main__":
             print("\n")
         elif choice == "2":
             dataset = push_dataset_to_hub(
-                val_path="dataset/tbiodiv_dataset.csv", 
-                test_path="dataset/tbiodiv_dataset_test.csv",
-                repo_path="tbiodivHorizontalCEA2024"
+                # val_path="dataset/tbiodiv_dataset.csv", 
+                # test_path="dataset/tbiodiv_dataset_test.csv",
+                # repo_path="tbiodivHorizontalCEA2024"
+                dataset_path="dataset/Dataset 100m.csv",
+                repo_path="WindSpeed_100m"
             )
             print("\n")
         elif choice == "3":

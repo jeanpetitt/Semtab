@@ -1,7 +1,6 @@
 import modal
 
-app = modal.App("App-Test")  # creating an App
-
+app = modal.App()
 
 @app.function(gpu="A10G")  # defining a Modal Function with a GPU
 def check_gpus():

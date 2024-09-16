@@ -309,6 +309,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                 _value2 = "".join(value.split("/")[:-1])
                                 if _value1 == _value2:
                                     print(f"http://www.wikidata.org/entity/{entity_id}")
+                                    if is_ceaTask: return f"http://www.wikidata.org/entity/{entity_id}"
                                     return {
                                         'prop_id': claim["mainsnak"]["property"],
                                         'prop_value': label_value
@@ -319,7 +320,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                 decoded_filename = unquote(filename)
                                 if value == decoded_filename:
                                     print(f"http://www.wikidata.org/entity/{entity_id}")
-                                    if is_ceaTask: return entity_id
+                                    if is_ceaTask: return f"http://www.wikidata.org/entity/{entity_id}"
                                     return {
                                         'prop_id': claim["mainsnak"]["property"],
                                         'prop_value': label_value
@@ -334,7 +335,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                 }
                         elif value == FlexibleValue(label_value):
                             print(f"http://www.wikidata.org/entity/{entity_id}")
-                            if is_ceaTask: return entity_id
+                            if is_ceaTask: return f"http://www.wikidata.org/entity/{entity_id}"
                             return {
                                 'prop_id': property_id,
                                 'prop_value': label_value
@@ -362,7 +363,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                     # should be deleted after the challenge
                                     if label == label_value or idx == label_value:
                                         print(f"http://www.wikidata.org/entity/{entity_id}")
-                                        if is_ceaTask: return entity_id
+                                        if is_ceaTask: return f"http://www.wikidata.org/entity/{entity_id}"
                                         return {
                                             'prop_id': property_id,
                                             'prop_value': label_value
@@ -379,7 +380,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                         if 'amount' in value and not isinstance(value, str) and is_number(label_value):
                             if is_horizontal and not is_combined:
                                 if value['amount'] == FlexibleValue(label_value):
-                                    print(f"http://www.wikidata.org/entity/{entity_id}")
+                                    if is_ceaTask: return f"http://www.wikidata.org/entity/{entity_id}"
                                     return {
                                         'prop_id': property_id,
                                         'prop_value': label_value
@@ -389,8 +390,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                 # comput the difference between two number due to update
                                 """ At the end of the challenfe i should reformat this code"""
                                 if FlexibleValue(value) == label_value or value == label_value:
-                                    if is_ceaTask: return entity_id
-                                    print(f"http://www.wikidata.org/entity/{entity_id}")
+                                    if is_ceaTask: return f"http://www.wikidata.org/entity/{entity_id}"
                                     return {
                                         'prop_id': property_id,
                                         'prop_value': label_value
@@ -415,8 +415,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                     # print(f"{val1, val2, dif}")
                                     # print(dif)
                                     if dif > 0 and dif < 2.89:
-                                        if is_ceaTask: return entity_id
-                                        print(f"http://www.wikidata.org/entity/{entity_id}")
+                                        if is_ceaTask: return f"http://www.wikidata.org/entity/{entity_id}"
                                         return {
                                             'prop_id': property_id,
                                             'prop_value': label_value
@@ -435,8 +434,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                     }
                             else:
                                 if FlexibleValue(value) == label_value or is_equal_distance(label_value, value):
-                                    if is_ceaTask: return entity_id
-                                    print(f"http://www.wikidata.org/entity/{entity_id}")
+                                    if is_ceaTask: return f"http://www.wikidata.org/entity/{entity_id}"
                                     return {
                                         'prop_id': property_id,
                                         'prop_value': label_value
@@ -470,8 +468,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                     point_value_label = extract_numbers(label_value)
                                     point_value_label = Point(point_value_label[0], point_value_label[1])
                                     if point_value == point_value_label:
-                                        print(f"http://www.wikidata.org/entity/{entity_id}")
-                                        if is_ceaTask: return entity_id
+                                        if is_ceaTask: return f"http://www.wikidata.org/entity/{entity_id}"
                                         return {
                                             'prop_id': property_id,
                                             'prop_value': label_value
@@ -490,8 +487,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                     }
                             else:
                                 if label_value[0:10] == value[1:11] or label_value[0:10] == value[0:10] or label_value[0:4] == value[0:4]  or label_value[0:4] == value[1:5] or label_value[0:7] == value[:7]or label_value[0:7] == value[1:8]:
-                                    if is_ceaTask: return entity_id
-                                    print(f"http://www.wikidata.org/entity/{entity_id}")
+                                    if is_ceaTask: return f"http://www.wikidata.org/entity/{entity_id}"
                                     return {
                                         'prop_id': property_id,
                                         'prop_value': label_value
@@ -507,8 +503,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                     }
                             else:
                                 if value == label_value:
-                                    if is_ceaTask: return entity_id
-                                    print(f"http://www.wikidata.org/entity/{entity_id}")
+                                    if is_ceaTask: return f"http://www.wikidata.org/entity/{entity_id}"
                                     return {
                                         'prop_id': property_id,
                                         'prop_value': label_value
@@ -529,8 +524,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                     }
                             else:  
                                 if value == label_value:
-                                    if is_ceaTask: return entity_id
-                                    print(f"http://www.wikidata.org/entity/{entity_id}")
+                                    if is_ceaTask: return f"http://www.wikidata.org/entity/{entity_id}"
                                     return {
                                         'prop_id': property_id,
                                         'prop_value': label_value
@@ -548,8 +542,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                             }
                                     else:
                                         if value == label_value[:4]:
-                                            if is_ceaTask: return entity_id
-                                            print(f"http://www.wikidata.org/entity/{entity_id}")
+                                            if is_ceaTask: return f"http://www.wikidata.org/entity/{entity_id}"
                                             return {
                                                 'prop_id': property_id,
                                                 'prop_value': label_value
@@ -572,8 +565,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                             }
                                     else:
                                         if value[:4] in label_value:
-                                            if is_ceaTask: return entity_id
-                                            print(f"http://www.wikidata.org/entity/{entity_id}")
+                                            if is_ceaTask: return f"http://www.wikidata.org/entity/{entity_id}"
                                             return {
                                                 'prop_id': property_id,
                                                 'prop_value': label_value
@@ -585,112 +577,96 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                                 property_values[index] = value
                                                 break
                         property_value_ids.append(claim["mainsnak"]["property"])
-            # print(entity_property_values)
-            # if not is_horizontal:
-            #     property_values = is_subpart(property_values, entity_property_values) 
-            #     converted_data = [frozenset(item.items()) if isinstance(item, dict) else item for item in entity_property_values]
-            #     entity_properties.extend([entity_property_values, property_value_ids])
-            #     if set(property_values).issubset(set(converted_data)):
-            #         property_ids = []
-            #         print(property_values, entity_properties)
-            #         indeces = [entity_properties[0].index(item) for item in property_values]
-            #         print(indeces)
-            #         for index in indeces:
-            #             property_ids.append(entity_properties[1][index])                      
-            #         entity_properties = []
-            #         i = 0
-            #         for elt in property_ids:
-            #             entity_properties.append({
-            #                 'prop_id': elt,
-            #                 'prop_value': property_values[i]
-            #             })
-            #             i += 1
-            #         print(entity_properties)
-            #         return entity_properties
 
     return None   
 
-def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, label_current=None, context_have_string_value=False, is_cpa_task=False):
+def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, label_current=None, context_have_string_value=False):
     if len(property_values) == 0:
         return entity_ids
+    property_values = property_values[1:]
     print(len(entity_ids))
 
     for entity_id in entity_ids:
-        url = f"https://www.wikidata.org/w/api.php?action=wbgetclaims&entity={entity_id}&format=json"
-        response = requests.get(url)
-        data = response.json()
+        try:
+            url = f"https://www.wikidata.org/w/api.php?action=wbgetclaims&entity={entity_id}&format=json"
+            response = requests.get(url)
+            data = response.json()
+            if "claims" in data:
+                claims = data["claims"]
+                entity_property_values = []
+                property_ids = []
+                property_values_label = []
 
-        if "claims" in data:
-            claims = data["claims"]
-            entity_property_values = []
-            property_ids = []
-            property_values_label = []
-
-            for property_id, property_claims in claims.items():
-                i = 1
-                for claim in property_claims:
-                    if "mainsnak" in claim and "datavalue" in claim["mainsnak"]:
-                        value = claim["mainsnak"]["datavalue"]["value"]
-                        if context_have_string_value:
+                for property_id, property_claims in claims.items():
+                    i = 1
+                    for claim in property_claims:
+                        if "mainsnak" in claim and "datavalue" in claim["mainsnak"]:
+                            value = claim["mainsnak"]["datavalue"]["value"]
                             if 'id' in value and not isinstance(value, str):
-                                # print(value['id'])
-                                result = get_entity_with_id(value['id'])
-                                label = result['label'] if 'label' in result else ''
-                                if label in property_values:
-                                    entity_property_values.append(label)
-                                else:
-                                    continue
-                                if i == len(property_values):
-                                    break
-                                else:
-                                    i += 1
-                                    continue
-                        if 'amount' in value and not isinstance(value, str):
-                            value = value['amount']
-                            entity_property_values.append(value)
-                        elif 'longitude' and 'latitude' in value and not isinstance(value, str):
-                            precision = value['precision']
-                            # print(value)
-                            if precision and  precision > 0:
-                                longitude = round(float(value['longitude']), int(-math.log10(precision)))
-                                latitude = round((value['latitude']), int(-math.log10(precision)))
-                            else:
-                                longitude = value['longitude']
-                                latitude = value['latitude']
-                            value = f"Point({longitude}, {latitude})"
-                            entity_property_values.append(value)
-                        elif 'time' in value and not isinstance(value, str):
-                            value = value['time'][1:11]
-                            entity_property_values.append(value)
-                        else:
-                            entity_property_values.append(value)
-                        if property_id == "P571":
-                            if value in property_values:
-                                pass
-                            elif value.isdigit():
-                                _values = []
-                                for item in property_values:
-                                    if ((len(item.split("-")) or len((item.split("/"))) == 3 and (item.split['-'][0].isdigit()) or item.split['/'][0].isdigit())):
-                                        _values.append(item[0:4])
+                                    # print(value['id'])
+                                    result = get_entity_with_id(value['id'])
+                                    label = result['label'] if 'label' in result else ''
+                                    if label in property_values:
+                                        entity_property_values.append(label)
                                     else:
-                                        _values.append(item)
-                                if value in _values:
-                                    property_values = _values
-                            elif value[0:4].isdigit():
-                                _values = value[0:7]
-                                for item in property_values:
-                                    if _values or value[0:4] in item:
-                                        index = property_values.index(item)
-                                        property_values[index] = value
+                                        continue
+                                    if i == len(property_values):
                                         break
-            # print(entity_property_values)
-            property_values = is_subpart(property_values, entity_property_values) 
-            converted_data = [frozenset(item.items()) if isinstance(item, dict) else item for item in entity_property_values]
-            if set(property_values).issubset(set(converted_data)):
-                print("Yes")
+                                    else:
+                                        i += 1
+                                        continue
+                            
+                            elif 'amount' in value and not isinstance(value, str):
+                                value = value['amount']
+                                entity_property_values.append(value)
+                            elif 'longitude' and 'latitude' in value and not isinstance(value, str):
+                                precision = value['precision']
+                                # print(value)
+                                if precision and  precision > 0:
+                                    longitude = round(float(value['longitude']), int(-math.log10(precision)))
+                                    latitude = round((value['latitude']), int(-math.log10(precision)))
+                                else:
+                                    longitude = value['longitude']
+                                    latitude = value['latitude']
+                                value = f"Point({longitude}, {latitude})"
+                                entity_property_values.append(value)
+                            elif 'time' in value and not isinstance(value, str):
+                                value = value['time'][1:11]
+                                entity_property_values.append(value)
+                            elif 'text' in value and not isinstance(value, str):
+                                value = value['text']
+                                entity_property_values.append(value)
+                            else:
+                                entity_property_values.append(value)
+                            if property_id == "P571":
+                                if value in property_values:
+                                    pass
+                                elif value.isdigit():
+                                    _values = []
+                                    for item in property_values:
+                                        if ((len(item.split("-")) or len((item.split("/"))) == 3 and (item.split['-'][0].isdigit()) or item.split['/'][0].isdigit())):
+                                            _values.append(item[0:4])
+                                        else:
+                                            _values.append(item)
+                                    if value in _values:
+                                        property_values = _values
+                                elif value[0:4].isdigit():
+                                    _values = value[0:7]
+                                    for item in property_values:
+                                        if _values or value[0:4] in item:
+                                            index = property_values.index(item)
+                                            property_values[index] = value
+                                            break
                 # print(entity_property_values)
-                return entity_id
+                property_values = is_subpart(property_values, entity_property_values) 
+                converted_data = [frozenset(item.items()) if isinstance(item, dict) else item for item in entity_property_values]
+                if set(property_values).issubset(set(converted_data)):
+                    print("Yes")
+                    # print(entity_property_values)
+                    return entity_id
 
+        except:
+            print("Not entity")
     return None
 
 
