@@ -1,6 +1,6 @@
 from object_task import *
 from evaluation.cea_evaluator import CEA_Evaluator
-from finetuning.utils import compare_csv, csv_to_jsonl, fineTuningJobID, inference, annotateCea, combineJsonFile
+from finetuning.utils import inference, combineJsonFile
 from evaluation.cta_evaluator import CTA_Evaluator
 from evaluation.ra_evaluator import RA_Evaluator
 from evaluation.td_evaluator import TD_Evaluator
@@ -29,7 +29,7 @@ if __name__ == "__main__":
         if choice == "1":
             """========== CEA Task============"""
             """ LLM track"""
-            # cea_task_llm._makeDataset(header=True)
+            # cea_task_llm._makeDataset(header=True, is_train=True, transpose=True)
             # cea_task_wikidata_23._makeDataset(header=True, col_before_row=False)
             """ Accuracy Track """
             # cea_task_wikidata_24._makeDataset(header=True, col_before_row=False)
@@ -46,7 +46,7 @@ if __name__ == "__main__":
             # test_cea_task_tbiomed_hor._makeDataset(header=True, comma_in_cell=True, is_train=False)
             # test_cea_task_tbiodiv_entity._makeDataset(is_vertical=True, comma_in_cell=True, is_train=False)
             # test_cea_task_tbiomed_entity._makeDataset(is_vertical=True, comma_in_cell=True, is_train=False)
-            # test_cea_task_wikidata_24._makeDataset(header=True, col_before_row=False, is_train=False, split=639261)
+            # test_cea_task_wikidata_24._makeDataset(header=True, col_before_row=False, is_train=False, split=1496521)
    
             
             """========== CTA Task============"""
@@ -79,14 +79,14 @@ if __name__ == "__main__":
             # test_ra_task_tbiodiv_hor._makeDataset(header=True, is_train=False)
             # test_ra_task_tbiomed_hor._makeDataset(header=True, is_train=False)
             """========== TD Task============"""
-            # td_task_tbiodiv_entity._makeDataset()
-            # td_task_tbiodiv_hor._makeDataset(n=4)
-            # td_task_tbiomed_entity._makeDataset()
-            # td_task_tbiomed_hor._makeDataset(n=4)
+            # td_task_tbiodiv_entity._makeDataset(is_entity=True)
+            # td_task_tbiodiv_hor._makeDataset()
+            # td_task_tbiomed_entity._makeDataset(is_entity=True)
+            # td_task_tbiomed_hor._makeDataset()
             """========== TD Task============"""
-            # test_td_task_tbiodiv_entity._makeDataset(is_train=False)
-            # test_td_task_tbiodiv_hor._makeDataset(is_train=False)
-            # test_td_task_tbiomed_entity._makeDataset(is_train=False)
+            # test_td_task_tbiodiv_entity._makeDataset(is_train=False, is_entity=True)
+            test_td_task_tbiodiv_hor._makeDataset(is_train=False)
+            # test_td_task_tbiomed_entity._makeDataset(is_train=False, is_entity=True)
             # test_td_task_tbiomed_hor._makeDataset(is_train=False)
             print("\n")
         elif choice == "2":

@@ -91,6 +91,7 @@ class TDTask:
     
     def buildDataset(
         self,
+        is_entity=False,
         n=5
     ):
         """_summary_
@@ -152,8 +153,25 @@ class TDTask:
                             column_selected.append(processed_elements)
                             
                     if not column_selected:
-                        column_selected = _file.iloc[0:2, 1:3].dropna().values.tolist()
-                        print("==============true============")
+                        if is_entity:
+                            column_selected=[_file.columns[1]]
+                        else:
+                            column_selected = _file.iloc[0:2, 1:3].dropna().values.tolist()
+                            # print(column_selected)
+                            for elements in column_selected:
+                                i = column_selected.index(elements) # save index of the Old value
+                                for elt in elements:
+                                    if contains_html_tags(elt):
+                                        elements.remove(elt)
+                                        continue
+                                    if "http" or "%" in elements and not contains_html_tags(elt):                                    
+                                        new_element = decole_url_file(elt)
+                                        index = elements.index(elt)
+                                        # here we update the value the elements index
+                                        elements[index] = new_element
+                                    # update value of the column_select elements:
+                                    column_selected[i] = elements
+                                    
                         
                     max_returned_token = self.compute_max_token(len(str(column_selected)), 0)
                     while not max_returned_token:
@@ -179,13 +197,14 @@ class TDTask:
     def _makeDataset(
         self,
         is_train=True,
+        is_entity=False,
         n=5
     ):
         """ 
             This function take two csv file which are almost same and compare the rows of the two files
             in order to create a new file that is same of the csv file 1
         """
-        _raw_dataset, _target = self.buildDataset(n=n)
+        _raw_dataset, _target = self.buildDataset(n=n, is_entity=is_entity)
         with open(_target, 'r') as file1, open(_raw_dataset, 'r') as file2:
             _reader1 = csv.reader(file1)
             _reader2 = csv.reader(file2)

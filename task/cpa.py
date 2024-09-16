@@ -88,13 +88,13 @@ class CPATask:
 
         return result
     
-    def contains_html_tags(self, text):
-        # Define a regex pattern for HTML tags
-        html_tag_pattern = re.compile(r'<[^>]+>')
-        # Search for the pattern in the input text
-        if html_tag_pattern.search(text):
-            return True
-        return False
+    # def contains_html_tags(self, text):
+    #     # Define a regex pattern for HTML tags
+    #     html_tag_pattern = re.compile(r'<[^>]+>')
+    #     # Search for the pattern in the input text
+    #     if html_tag_pattern.search(text):
+    #         return True
+    #     return False
     
     def buildDataset(
         self,
@@ -137,11 +137,18 @@ class CPATask:
                     list_row__with_empty_data = []
                     if is_entity:
                         for index, row in _file.iloc[0:].iterrows():
-                            noNanElemenent = row[1:]
-                            noNanElemenent = [str(x) for x in noNanElemenent if (not isinstance(x, float) ) and not contains_html_tags(str(x))]
+                            noNanElemenent = row[1:].tolist()
+                            for elt in noNanElemenent:
+                                index = noNanElemenent.index(elt)
+                                if (not isinstance(elt, float) ) and not contains_html_tags(str(elt)):
+                                    noNanElemenent.remove(elt)
+                                elif "http" and "%" in str(elt):
+                                    new_element = decole_url_file(str(elt))
+                                    noNanElemenent[index] = new_element
+                            # noNanElemenent = [str(x) for x in noNanElemenent if (not isinstance(x, float) ) and not contains_html_tags(str(x))]
                             """ When file come from entity folder each cell represent column"""
                             _cell_selected = noNanElemenent
-                            _cell_selected =  [random.choice(x.split(',')) for x in _cell_selected]
+                            _cell_selected =  [random.choice(str(x).split(',')) for x in _cell_selected]
                             list_cell_selected.append(",".join(_cell_selected))
                     else:
                         

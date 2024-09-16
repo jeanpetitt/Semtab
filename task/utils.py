@@ -1,5 +1,5 @@
 import re
-
+from urllib.parse import unquote
 
 def is_number(string):
     word = "".join(str(string).split())[0:6]
@@ -39,3 +39,11 @@ def is_valid_string(s):
     # This pattern checks that the string does not contain ?, @, #, or $ in invalid positions
     pattern = r"^[^?@#$][^\?@#$]*[^?@#$]?$"
     return bool(re.match(pattern, s))
+
+
+def decole_url_file(url_file: str):
+    filename = url_file.split("/")[-1]
+    decoded_filename = unquote(filename)
+    return decoded_filename
+
+# print(decole_url_file("http://commons.wikimedia.org/wiki/Special:FilePath/JAS%2039%20Gripen%20momument%20L%C3%A5ngholmen%202.jpg"))
