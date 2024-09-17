@@ -14,7 +14,7 @@ if __name__ == "__main__":
         print("************************************************************")
         print("1. make csv dataset")
         print("2. push data to hub")
-        print("3. make csv dataset")
+        print("3. make json dataset")
         print("4. Combine json datasets")
         print("5. Create FinTuning Job ID in openAI")
         print("6. Make simple inference with model finetuned")
@@ -38,10 +38,21 @@ if __name__ == "__main__":
             # R2_test_cta_task_wikidata_24._makeDataset()
             
             """=================TD task========================="""
+            # R2_test_td_task_tbiodiv_entity._makeDataset()
             # R2_test_td_task_tbiomed_entity._makeDataset()
             # R2_test_td_task_tbiodiv_entity._makeDataset()
             # R2_test_td_task_tbiodiv_hor._makeDataset()
             # R2_test_td_task_tbiomed_hor._makeDataset()
+            
+            """========== CPA Task============"""
+            # R2_test_cpa_task_tbiodiv_entity._makeDataset()
+            # R2_test_cpa_task_tbiomed_entity._makeDataset()
+            # R2_test_cpa_task_wikidata_24._makeDataset(is_entity=False, is_train=False)
+            # R2_test_cpa_task_tbiomed_hor._makeDataset(is_entity=False, is_horizontal=True)
+            # R2_test_cpa_task_tbiodiv_hor._makeDataset(is_entity=False, is_horizontal=True)
+            
+            """========== CEA Task============"""
+            R2_test_cea_task_tbiomed_entity._makeDataset(is_vertical=True, comma_in_cell=True)
             
             """ ==================================================="""
             """ ==================Round 1================================="""
@@ -102,7 +113,7 @@ if __name__ == "__main__":
             # td_task_tbiodiv_hor._makeDataset()
             # td_task_tbiomed_entity._makeDataset(is_entity=True)
             # td_task_tbiomed_hor._makeDataset()
-            """========== TD Task============"""
+            """========== TD test Task============"""
             # test_td_task_tbiodiv_entity._makeDataset(is_train=False, is_entity=True)
             # test_td_task_tbiodiv_hor._makeDataset(is_train=False)
             # test_td_task_tbiomed_entity._makeDataset(is_train=False, is_entity=True)
@@ -110,15 +121,33 @@ if __name__ == "__main__":
             print("\n")
         elif choice == "2":
             dataset = push_dataset_to_hub(
-                val_path="dataset/tbiomed_td_dataset.csv", 
-                test_path="dataset/tbiomed_td_dataset_test.csv",
-                repo_path="tbiomedEntityTD2024"
-                # dataset_path="dataset/Dataset 100m.csv",
+                train_path="data/result/round2/cpa/dataset/wikidata/wikidata_dataset_cpa_test.csv", 
+                # test_path="dataset/td/tbiodiv/horizontal/tbiodiv_dataset_td_test.csv",
+                repo_path="R2_WikidataCPA2024",
+                # dataset_path="TD_Conversational2024.jsonl",
                 # repo_path="WindSpeed_100m"
             )
             print("\n")
         elif choice == "3":
             """ llm 2024 """
+            """================Round2================"""
+            "==============TD task=================="
+            # R2_test_td_task_tbiodiv_entity._csv_to_jsonl(
+            #     csv_path=R2_td_dataset_tbiodiv_entity,
+            #     json_path=R2_td_dataset_json_tbiodiv_entity
+            # )
+            # R2_test_td_task_tbiomed_entity._csv_to_jsonl(
+            #     csv_path=R2_td_dataset_tbiomed_entity,
+            #     json_path=R2_td_dataset_json_tbiomed_entity
+            # )
+            # R2_test_td_task_tbiodiv_hor._csv_to_jsonl(
+            #     csv_path=R2_td_dataset_tbiodiv_hor,
+            #     json_path=R2_td_dataset_json_tbiodiv_hor
+            # )
+            # R2_test_td_task_tbiomed_hor._csv_to_jsonl(
+            #     csv_path=R2_td_dataset_tbiomed_hor,
+            #     json_path=R2_td_dataset_json_tbiomed_hor
+            # )
             # cea_task_llm._csv_to_jsonl(
             #     csv_path=cea_dataset_llm,
             #     json_path=cea_dataset_json_llm
@@ -175,15 +204,15 @@ if __name__ == "__main__":
             #     csv_path=td_dataset_tbiomed_hor, 
             #     json_path=td_dataset_json_tbiomed_hor
             # )
-            print("\n")
+            # print("\n")
         elif choice == "4":
-            combineJsonFile(
-                path_folder=cea_full_json_path_folder,
-                updated_json_path="train_llm1.jsonl"
-            )
-            # cta_task_tfood_hor._combineJsonFile(
-            #     json_path=cta_full_json_path_folder,
-            #     json_output_dataset=cta_full_json_train_dataset,
+            # combineJsonFile(
+            #     path_folder=cea_full_json_path_folder,
+            #     updated_json_path="train_llm1.jsonl"
+            # )
+            # td_task_tbiomed_entity._combineJsonFile(
+            #     json_path="data/json/Round1/td",
+            #     json_output_dataset="td_R1.jsonl",
             #     split="train[:100%]"
             # )
             # cta_task_tfood_hor._combineJsonFile(
@@ -194,8 +223,8 @@ if __name__ == "__main__":
             print("\n")
         elif choice == "5":
             gpttuner.fineTuningJobID(
-                training_path="train_table_detection_update.jsonl", 
-                validation_file_path="val_table_detection_update.jsonl"
+                training_path="TD_Conversational2024_train.jsonl", 
+                validation_file_path="TD_Conversational2024_val.jsonl"
             )
             # gpttuner.fineTuningJobID(
             #     training_path="train_llm1.jsonl",

@@ -49,7 +49,11 @@ def split_dataset(data, split_str):
 
 
 def open_csv(path, split=None):
-    df = pd.read_csv(path, dtype=str)
+    df = []
+    try:
+        df = pd.read_csv(path, dtype=str)
+    except:
+        df = pd.read_json(path)
     return df
 
 
@@ -79,7 +83,7 @@ def push_dataset_to_hub(
     
     if dataset_path:
         data = open_csv(dataset_path)
-        train_data, train_remaining_data = split_dataset(data=data, split_str="train[80%]")
+        train_data, train_remaining_data = split_dataset(data=data, split_str="train[90%]")
         train_dataset = Dataset.from_pandas(train_data)
         test_data, test_remaining_data = split_dataset(train_remaining_data, split_str="test[50%]")
         test_dataset = Dataset.from_pandas(test_data)
@@ -131,7 +135,7 @@ def push_dataset_to_hub(
         })
     else:
         dataset_dict = DatasetDict({
-            "train": train_dataset
+            "test": train_dataset
         })
     
     dataset_dict.push_to_hub(repo_path)

@@ -63,7 +63,7 @@ class CPATask:
                 for idx, item in enumerate(sublist):
                     if not pd.isna(item):
                         if is_horizontal:
-                            result.append({"item": item, "index": idx, "identifier": identifier})
+                            result.append({"item": item, "index": idx, "data": identifier})
                         else:
                             result.append({"item": item, "index": idx, "data": temp})
             else:
@@ -72,7 +72,7 @@ class CPATask:
                 for idx in nan_indices:
                     if not pd.isna(sublist[idx]):
                         if is_horizontal:
-                            new_items.append({"item": sublist[idx], "index": idx, "identifier": identifier})
+                            new_items.append({"item": sublist[idx], "index": idx, "data": identifier})
                         else:
                             new_items.append({"item": sublist[idx], "index": idx, 'data': temp})
                 # Ajouter les nouveaux éléments non NaN à result
@@ -137,19 +137,26 @@ class CPATask:
                     list_row__with_empty_data = []
                     if is_entity:
                         for index, row in _file.iloc[0:].iterrows():
-                            noNanElemenent = row[1:].tolist()
+                            noNanElemenent = row[1:]
+                            # print(noNanElemenent)
+                            new_list = []
                             for elt in noNanElemenent:
-                                index = noNanElemenent.index(elt)
-                                if (not isinstance(elt, float) ) and not contains_html_tags(str(elt)):
-                                    noNanElemenent.remove(elt)
+                                # index = noNanElemenent.index(elt)
+                                if pd.isna(elt) or contains_html_tags(str(elt)):
+                                    continue
                                 elif "http" and "%" in str(elt):
                                     new_element = decole_url_file(str(elt))
-                                    noNanElemenent[index] = new_element
+                                    # noNanElemenent[index] = new_element
+                                    new_list.append(new_element)
+                                else:
+                                    new_list.append(elt)
+                            noNanElemenent = new_list
                             # noNanElemenent = [str(x) for x in noNanElemenent if (not isinstance(x, float) ) and not contains_html_tags(str(x))]
                             """ When file come from entity folder each cell represent column"""
                             _cell_selected = noNanElemenent
                             _cell_selected =  [random.choice(str(x).split(',')) for x in _cell_selected]
                             list_cell_selected.append(",".join(_cell_selected))
+                            # print(list_cell_selected)
                     else:
                         
                         # print("fichier:", filename, "Number of cols ", total_col)
@@ -228,8 +235,8 @@ class CPATask:
                             else:                
                                 total_col = len(list_cell_selected)
                                 while col < total_col:
-                                        writer.writerow([filename, 0, col+1, list_cell_selected[col]['item'], list_cell_selected[col]['data']])
-                                        col += 1
+                                    writer.writerow([filename, 0, col+1, list_cell_selected[col]['item'], list_cell_selected[col]['data']])
+                                    col += 1
 
                                 
                 else:
@@ -241,7 +248,8 @@ class CPATask:
         self,
         header=True,
         is_entity=True,
-        is_horizontal=False
+        is_horizontal=False,
+        is_train=True,
     ):
         """ 
             This function take two csv file which are almost same and compare the rows of the two files
@@ -262,21 +270,29 @@ class CPATask:
             
             updated_data = []
             if is_entity:
-                updated_data.append(["tab_id", "col_j", "col_label", "list_col"])
+                updated_data.append(["tab_id", "col_j", "col_label", "list_col", "entity"])
             else:
-                updated_data.append(["tab_id", "col0", "col_j", "col_label", "list_col"])
+                updated_data.append(["tab_id", "col0", "col_j", "col_label", "list_col", "entity"])
             for row1 in csv1_data:
                 match_found = False
                 for row2 in csv2_data:
                     if is_entity:
                         if row1[:2] == row2[:2]:
                             match_found = True
+                            if is_train:
+                                row2.append(row1[2])
+                            else:
+                                row2.append("NIL")
                             updated_data.append(row2)
                             # print(f"Row {row1} it is in CSV2")
                             break    
                     else:
                         if row1[:3] == row2[:3]:
                             match_found = True
+                            if is_train:
+                                row2.append(row1[3])
+                            else:
+                                row2.append("NIL")
                             updated_data.append(row2)
                             # print(f"Row {row1} it is in CSV2")
                             break      

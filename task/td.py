@@ -249,7 +249,12 @@ class TDTask:
         datas = []
         
         for i in range(len(df['columns'])):
-            table = eval(df['columns'][i])
+            # print(df['tab_id'][i])
+            table = []
+            try:         
+                table = eval(df['columns'][i])
+            except:
+                table = [df['columns'][i]]
             uri = df['entity'][i]
             
             prompt_input = f"Please Give the  wikidata URI of of the topic of this table: {table}"

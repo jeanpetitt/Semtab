@@ -519,6 +519,6 @@ class CTATask:
                         print("*************************")
                         print(f"Col {i} annotated")
                         print("*************************")
-                        i += 1  
+                        i += 1
                     else:
                         print("it is not csv file")

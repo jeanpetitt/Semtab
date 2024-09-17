@@ -9,3 +9,8 @@ venv
 # File too long
 data*
 output*
+dataset/td
+dataset/cea
+dataset/cpa
+dataset/ra
+dataset/cta
