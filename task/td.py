@@ -162,9 +162,10 @@ class TDTask:
                                 i = column_selected.index(elements) # save index of the Old value
                                 for elt in elements:
                                     if contains_html_tags(elt):
+                                        print(elt)
                                         elements.remove(elt)
                                         continue
-                                    if "http" or "%" in elements and not contains_html_tags(elt):                                    
+                                    if "http" and "%" in elt and not contains_html_tags(elt):                                    
                                         new_element = decole_url_file(elt)
                                         index = elements.index(elt)
                                         # here we update the value the elements index
@@ -175,6 +176,7 @@ class TDTask:
                         
                     max_returned_token = self.compute_max_token(len(str(column_selected)), 0)
                     while not max_returned_token:
+                        print(column_selected)
                         if not isinstance(column_selected, str):
                             column_selected = str(column_selected)
                         column_selected = eval(column_selected)[-1]
@@ -216,7 +218,7 @@ class TDTask:
             if is_train:
                 updated_data.append(["tab_id", "columns", "entity"])
             else:
-                updated_data.append(["tab_id", "columns"])          
+                updated_data.append(["tab_id", "columns", "entity"])          
             for row1 in csv1_data:
                 match_found = False
                 for row2 in csv2_data:
@@ -224,6 +226,8 @@ class TDTask:
                         match_found = True
                         if is_train:
                             row2.append(row1[1])
+                        else:
+                            row2.append("NIL")
                         updated_data.append(row2)
                         # print(f"Row {row1} it is in CSV2")
                         break         

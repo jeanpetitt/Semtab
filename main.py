@@ -27,6 +27,26 @@ if __name__ == "__main__":
         choice = input("\nPlease select an option: ")
 
         if choice == "1":
+            
+            
+            
+            """ ==================================================="""
+            """ ==================Round 2================================="""
+            """ ==================================================="""
+            
+            """=================CTA task========================="""
+            # R2_test_cta_task_wikidata_24._makeDataset()
+            
+            """=================TD task========================="""
+            # R2_test_td_task_tbiomed_entity._makeDataset()
+            # R2_test_td_task_tbiodiv_entity._makeDataset()
+            # R2_test_td_task_tbiodiv_hor._makeDataset()
+            # R2_test_td_task_tbiomed_hor._makeDataset()
+            
+            """ ==================================================="""
+            """ ==================Round 1================================="""
+            """ ==================================================="""
+            
             """========== CEA Task============"""
             """ LLM track"""
             # cea_task_llm._makeDataset(header=True, is_train=True, transpose=True)
@@ -59,7 +79,6 @@ if __name__ == "__main__":
             
             # test_cta_task_tbiodiv_hor._makeDataset(is_train=False)
             # test_cta_task_tbiomed_hor._makeDataset(is_train=False)
-            # R2_test_cta_task_wikidata_24._makeDataset(is_train=False)
             
             """========== CPA Task============"""
             # cpa_task_tbiodiv_entity._makeDataset()
@@ -85,17 +104,17 @@ if __name__ == "__main__":
             # td_task_tbiomed_hor._makeDataset()
             """========== TD Task============"""
             # test_td_task_tbiodiv_entity._makeDataset(is_train=False, is_entity=True)
-            test_td_task_tbiodiv_hor._makeDataset(is_train=False)
+            # test_td_task_tbiodiv_hor._makeDataset(is_train=False)
             # test_td_task_tbiomed_entity._makeDataset(is_train=False, is_entity=True)
             # test_td_task_tbiomed_hor._makeDataset(is_train=False)
             print("\n")
         elif choice == "2":
             dataset = push_dataset_to_hub(
-                # val_path="dataset/tbiodiv_dataset.csv", 
-                # test_path="dataset/tbiodiv_dataset_test.csv",
-                # repo_path="tbiodivHorizontalCEA2024"
-                dataset_path="dataset/Dataset 100m.csv",
-                repo_path="WindSpeed_100m"
+                val_path="dataset/tbiomed_td_dataset.csv", 
+                test_path="dataset/tbiomed_td_dataset_test.csv",
+                repo_path="tbiomedEntityTD2024"
+                # dataset_path="dataset/Dataset 100m.csv",
+                # repo_path="WindSpeed_100m"
             )
             print("\n")
         elif choice == "3":

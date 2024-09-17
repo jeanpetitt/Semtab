@@ -215,6 +215,59 @@ cta_task_tfood_hor = CTATask(
 )
 
 """ ------2024-------"""
+""" ==================================================="""
+""" ==================Round 2================================="""
+""" ==================================================="""
+
+"""=================CTA task========================="""
+R2_test_cta_task_wikidata_24 = CTATask(
+    raw_output_dataset=R2_raw_cta,
+    output_dataset=R2_test_cta_dataset_wikidata_24,
+    target_file=R2_test_cta_target_wikidata_24,
+    table_path=R2_test_cta_dataset_table_path_wikidata_24,
+    file_annotated=R2_test_cta_wikidata_24,
+    target_file_to_annotate=R2_test_cta_target_wikidata_24
+)
+
+"""=================TD task========================="""
+R2_test_td_task_tbiomed_entity = TDTask(
+    raw_output_dataset=R2_raw_td,
+    output_dataset=R2_td_dataset_tbiomed_entity,
+    target_file=R2_td_target_tbiomed_entity,
+    table_path=R2_td_dataset_table_tbiomed_entity,
+    file_annotated=R2_td_tbiomed_entity,
+    target_file_to_annotate=R2_td_tbiomed_entity_target
+)
+R2_test_td_task_tbiodiv_entity = TDTask(
+    raw_output_dataset=R2_raw_td,
+    output_dataset=R2_td_dataset_tbiomed_entity,
+    target_file=R2_td_target_tbiodiv_entity,
+    table_path=R2_td_dataset_table_tbiodiv_entity,
+    file_annotated=R2_td_tbiodiv_entity,
+    target_file_to_annotate=R2_td_tbiodiv_entity_target
+)
+R2_test_td_task_tbiomed_hor = TDTask(
+    raw_output_dataset=R2_raw_td,
+    output_dataset=R2_td_dataset_tbiomed_hor,
+    target_file=R2_td_target_tbiomed_hor,
+    table_path=R2_td_dataset_table_tbiomed_hor,
+    file_annotated=R2_td_tbiomed_hor,
+    target_file_to_annotate=R2_td_tbiomed_hor_target
+)
+R2_test_td_task_tbiodiv_hor = TDTask(
+    raw_output_dataset=R2_raw_td,
+    output_dataset=R2_td_dataset_tbiodiv_hor,
+    target_file=R2_td_target_tbiodiv_hor,
+    table_path=R2_td_dataset_table_tbiodiv_hor,
+    file_annotated=R2_td_tbiodiv_hor,
+    target_file_to_annotate=R2_td_tbiodiv_hor_target
+)
+
+
+""" ==================================================="""
+""" ==================Round 1================================="""
+""" ==================================================="""
+
 cta_task_wikidata_24 = CTATask(
     raw_output_dataset=raw_cta,
     output_dataset=cta_dataset_wikidata_24,
@@ -252,14 +305,7 @@ test_cta_task_wikidata_24 = CTATask(
     target_file_to_annotate=test_cta_target_wikidata_24
 )
 
-R2_test_cta_task_wikidata_24 = CTATask(
-    raw_output_dataset=raw_cta,
-    output_dataset=R2_test_cta_dataset_wikidata_24,
-    target_file=R2_test_cta_target_wikidata_24,
-    table_path=R2_test_cta_dataset_table_path_wikidata_24,
-    file_annotated=R2_test_cta_wikidata_24,
-    target_file_to_annotate=R2_test_cta_target_wikidata_24
-)
+
 # tbiomed horizontal
 test_cta_task_tbiomed_hor = CTATask(
     raw_output_dataset=raw_cta,

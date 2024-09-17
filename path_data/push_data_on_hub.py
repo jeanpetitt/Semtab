@@ -49,14 +49,14 @@ def split_dataset(data, split_str):
 
 
 def open_csv(path, split=None):
-    df = pd.read_csv(path)
+    df = pd.read_csv(path, dtype=str)
     return df
 
 
 def login_hub(token=None):
     if not token:
         print(token)
-        return login(token=os.environ['HUB_TOKEN_Z'])
+        return login(token=os.environ['HUB_TOKEN'])
     return login(token=token)
 
 def push_dataset_to_hub(

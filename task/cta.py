@@ -6,6 +6,7 @@ from .helper import getNameCsvFile
 import re, openai
 from .symbolic.api import openUrl, get_instance_of
 from collections import Counter
+from .utils import *
 
 random.seed(42)
 def get_most_common_element(lst):
@@ -60,8 +61,7 @@ class CTATask:
         # print(df['label'][0:10])       
         return df
     
-
-
+    
     def buildDataset(
         self,
         header=True,
@@ -100,7 +100,7 @@ class CTATask:
                     list_cell_selected = []
                     for col in _file.columns:
                         noNanElemenent = _file[col].values
-                        noNanElemenent = set([str(x) for x in noNanElemenent if not isinstance(x, float) or not math.isnan(x)])
+                        noNanElemenent = [str(x) for x in noNanElemenent if (not isinstance(x, float) and not contains_html_tags(str(x)) and not 'http' in str(x))]
                         # print(noNanElemenent)
                         # noNanElemenent = ','.join(noNanElemenent)
                         # noNanElemenent = noNanElemenent.split(",")
@@ -110,7 +110,7 @@ class CTATask:
                             the column
                         """
                         if len(noNanElemenent) > 10:
-                            _cell_selected = random.sample(noNanElemenent, k=10)
+                            _cell_selected = random.sample(noNanElemenent, k=6)
                             _cell_selected = [random.choice(x.split(',')) for x in _cell_selected]
                             # print(_cell_selected)
                             list_cell_selected.append(_cell_selected)
@@ -127,7 +127,6 @@ class CTATask:
                     print("it is not csv file")
             csv_file.close()
         return self.raw_output_dataset, self.target_file
-    
     def _makeDataset(
         self,
         header=True,
@@ -137,10 +136,10 @@ class CTATask:
             This function take two csv file which are almost same and compare the rows of the two files
             in order to create a new file that is same of the csv file 1
         """
-        # _raw_dataset, _target = self.buildDataset(
-        #     header=header
-        # )
-        _raw_dataset, _target = self.raw_output_dataset, self.target_file
+        _raw_dataset, _target = self.buildDataset(
+            header=header
+        )
+        # _raw_dataset, _target = self.raw_output_dataset, self.target_file
         with open(_target, 'r') as file1, open(_raw_dataset, 'r') as file2:
             _reader1 = csv.reader(file1)
             _reader2 = csv.reader(file2)
