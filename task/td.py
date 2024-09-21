@@ -33,7 +33,7 @@ class TDTask:
         target_file, table_path, 
         file_annotated,
         target_file_to_annotate,
-        context_length=2500
+        context_length=4096
     ):
         """_summary_
 
@@ -202,9 +202,12 @@ class TDTask:
         is_entity=False,
         n=5
     ):
-        """ 
-            This function take two csv file which are almost same and compare the rows of the two files
-            in order to create a new file that is same of the csv file 1
+        """_summary_
+
+        Args:
+            is_train (bool, optional): _description_. Defaults to True.
+            is_entity (bool, optional): _description_. Defaults to False.
+            n (int, optional): _description_. Defaults to 5.
         """
         _raw_dataset, _target = self.buildDataset(n=n, is_entity=is_entity)
         with open(_target, 'r') as file1, open(_raw_dataset, 'r') as file2:
@@ -374,6 +377,19 @@ class TDTask:
             
     
     def inference(self, model_id, user_input=None, temperature=0.00, frequency_penalty=0, presence_penalty=0, max_tokens=2048):
+        """_summary_
+
+        Args:
+            model_id (_type_): _description_
+            user_input (_type_, optional): _description_. Defaults to None.
+            temperature (float, optional): _description_. Defaults to 0.00.
+            frequency_penalty (int, optional): _description_. Defaults to 0.
+            presence_penalty (int, optional): _description_. Defaults to 0.
+            max_tokens (int, optional): _description_. Defaults to 2048.
+
+        Returns:
+            wikidata_uri: _description_: This function return the uri of wikidata correponding \nto the given table in input
+        """
         chatBot = "Hi, I'm semantic annotation Agent. What can i do to help you today."
         if user_input is None:
             user_input = input('User: \n')
@@ -429,8 +445,18 @@ class TDTask:
         return uri
             
     
-    def _annotate(self, model, split=0):
-        filed = filed = self.output_dataset
+    def _annotate(self, model, path=None, split=0):
+        """_summary_
+
+        Args:
+            model (_type_): _description_: model id on openai
+            path (_type_, optional): _description_: Defaults to None. Path of the csv dataset .
+            split (int, optional): _description_: Defaults to 0.
+        """
+        if not path:
+            filed = self.output_dataset
+        else:
+            filed = path
         header_cta = ["tab_id", "col_id", "annotation"]
         
         with open(self.target_file_to_annotate, "r") as csv_file:

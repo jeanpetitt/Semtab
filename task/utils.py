@@ -36,7 +36,7 @@ def is_valid_format(s):
     return bool(re.match(pattern, s))
 
 def is_valid_string(s):
-    # This pattern checks that the string does not contain ?, @, #, or $ in invalid positions
+    # This pattern checks that the string does not contain , @, #, or $ in invalid positions
     pattern = r"^[^?@#$][^\?@#$]*[^?@#$]?$"
     return bool(re.match(pattern, s))
 

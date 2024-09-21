@@ -35,7 +35,8 @@ raw_td = "data/result/td/td.csv"
 R2_raw_cta = "data/result/round2/cta/cta.csv"
 R2_raw_td = "data/result/round2/td/td.csv"
 R2_raw_cpa = "data/result/round2/cpa/cpa.csv"
-R2_raw_cea = "data/result/round2/cea/accuracy/r2_cea.csv"
+R2_raw_cea = "data/result/round2/cea/r2_cea.csv"
+R2_raw_ra = "data/result/round2/ra/r2_ra.csv"
 
 """ cta"""
 cta_full_json_path_folder = "data/json/full/cta"
@@ -53,6 +54,8 @@ cea_model_finetuned_3 = "ft:gpt-3.5-turbo-0613:tib:annotator-cea:9Wpe5X7u"
 cea_model_finetuned_4 = "ft:gpt-3.5-turbo-0613:tib:annotator-cea:9Xo3Twdr"
 ra_model_finetuned = "ft:gpt-3.5-turbo-0613:tib:annotator-ra:9azlDasr"
 td_model_finetuned = "ft:gpt-3.5-turbo-0613:tib:annotator-td:9bYhZGqb"
+td_model_finetuned_1 = "ft:gpt-4o-mini-2024-07-18:tib:gpt-annotator-td-01-24:A8pg9aTY"
+td_model_finetuned_2 = "ft:gpt-4o-mini-2024-07-18:tib:annotator-td-02-24:A92bjRqv"
 
 """ ===============
     CEA TASK 2023 and 2024 semtab challenge
@@ -152,32 +155,81 @@ R2_test_cta_dataset_wikidata_24 = "ddata/result/round2/cea/accuracy/wikidata/dat
 R2_test_cta_target_wikidata_24 = "data/csv/semtab2024/AcuracyTrack/Round2/Wikidata/targets/cta_targets.csv"
 
 ## tbiomed Horizontal
+R2_cta_target_tbiomed_hor = "data/csv/semtab2024/AcuracyTrack/Round2/tbiomedicalLarge/horizontal/gt/cta_gt.csv"
+R2_cta_tbiomed_hor_target = "data/csv/semtab2024/AcuracyTrack/Round2/tbiomedicalLarge/horizontal/targets/cta_targets.csv"
+R2_cta_dataset_table_tbiomed_hor = "data/csv/semtab2024/AcuracyTrack/Round2/tbiomedicalLarge/horizontal/tables"
+R2_cta_tbiomed_hor = "data/result/round2/cta/annotate/tbiomed/tbiomed_cta_annotated.csv"
+R2_cta_dataset_tbiomed_hor = "data/result/round2/cta/dataset/tbiomed/tbiomed_dataset_cta.csv"
+R2_cta_dataset_json_tbiomed_hor = "data/json/Round2/cta/tbiomed/cta_tbiomed_hor.jsonl"
 
 ## tbiodov Horizontal
+R2_cta_target_tbiodiv_hor = "data/csv/semtab2024/AcuracyTrack/Round2/tbiodivLarge/horizontal/gt/cta_gt.csv"
+R2_cta_tbiodiv_hor_target = "data/csv/semtab2024/AcuracyTrack/Round2/tbiodivLarge/horizontal/targets/cta_targets.csv"
+R2_cta_dataset_table_tbiodiv_hor = "data/csv/semtab2024/AcuracyTrack/Round2/tbiodivLarge/horizontal/tables"
+R2_cta_tbiodiv_hor = "data/result/round2/cta/annotate/tbiodiv/tbiodiv_cta.csv"
+R2_cta_dataset_tbiodiv_hor = "data/result/round2/cta/dataset/tbiodiv/cta_tbiodiv_dataset.csv"
+R2_cta_dataset_json_tbiodiv_hor = "data/json/Round2/cta/tbiodiv/cta_tbiodiv_hor.jsonl"
 
 
 """ ==========CEA task==========="""
 ## Wikidata R2
+R2_test_cea_target_wikidata_24 = "data/csv/semtab2024/AcuracyTrack/Round2/Wikidata/targets/cea_targets.csv"
+R2_test_cea_dataset_table_path_wikidata_24 = "data/csv/semtab2024/AcuracyTrack/Round2/Wikidata/tables"
+R2_test_cea_wikidata_24 = "data/result/round2/cea/accuracy/annotate/wikidata/wikidata_test_cea_24_symb1.csv"
+R2_test_cea_dataset_wikidata_24 = "data/result/round2/cea/accuracy/dataset/wikidata/wikidata_test_dataset_24.csv"
+
 
 ## Tbiomed entity Round 2
 R2_cea_target_tbiomed_entity = "data/csv/semtab2024/AcuracyTrack/Round2/tbiomedicalLarge/entity/gt/cea_gt.csv"
 R2_cea_tbiomed_entity_target = "data/csv/semtab2024/AcuracyTrack/Round2/tbiomedicalLarge/entity/targets/cea_targets.csv"
 R2_cea_dataset_table_tbiomed_entity = "data/csv/semtab2024/AcuracyTrack/Round2/tbiomedicalLarge/entity/tables"
-R2_cea_tbiomed_entity = "data/result/round2/cea/accuracy/tbiomed/entity/annotate/tbiomed_cea.csv"
-R2_cea_dataset_tbiomed_entity = "data/result/round2/cea/accuracy/tbiomed/entity/dataset/tbiomed_cea_dataset.csv"
-R2_cea_dataset_json_tbiomed_entity = "data/json/app2/2024/accuracy/cea/tbiomed/entity/train_semtab2024_tbiomed_entity.jsonl"
-
+R2_cea_tbiomed_entity = "data/result/round2/cea/accuracy/annotate/tbiomed/entity/tbiomed_cea.csv"
+R2_cea_dataset_tbiomed_entity = "data/result/round2/cea/accuracy/dataset/tbiomed/entity/tbiomed_cea_dataset.csv"
+R2_cea_dataset_json_tbiomed_entity = "data/json/Round2/cea/accuracy/tbiomed/entity/train_cea_tbiomed_entity.jsonl"
 
 ## Tbiodiv entity Round 2
+R2_cea_target_tbiodiv_entity = "data/csv/semtab2024/AcuracyTrack/Round2/tbiodivLarge/entity/gt/cea_gt.csv"
+R2_cea_tbiodiv_entity_target = "data/csv/semtab2024/AcuracyTrack/Round2/tbiodivLarge/entity/targets/cea_targets.csv"
+R2_cea_dataset_table_tbiodiv_entity = "data/csv/semtab2024/AcuracyTrack/Round2/tbiodivLarge/entity/tables"
+R2_cea_tbiodiv_entity = "data/result/round2/cea/accuracy/annotate/tbiodiv/entity/tbiodiv_cea.csv"
+R2_cea_dataset_tbiodiv_entity = "data/result/round2/cea/accuracy/dataset/tbiodiv/entity/tbiodiv_dataset.csv"
+R2_cea_dataset_json_tbiodiv_entity = "data/json/Round2/cea/accuracy/tbiodiv/entity/train_cea_tbiodiv_entity.jsonl"
 
 ## tbiomed Horizontal
+R2_cea_target_tbiomed_hor = "data/csv/semtab2024/AcuracyTrack/Round2/tbiomedicalLarge/horizontal/gt/cea_gt.csv"
+R2_cea_tbiomed_hor_target = "data/csv/semtab2024/AcuracyTrack/Round2/tbiomedicalLarge/horizontal/targets/cea_targets.csv"
+R2_cea_dataset_table_tbiomed_hor = "data/csv/semtab2024/AcuracyTrack/Round2/tbiomedicalLarge/horizontal/tables"
+R2_cea_tbiomed_hor = "data/result/round2/cea/accuracy/annotate/tbiomed/horizontal/tbiomed_cea.csv"
+R2_cea_dataset_tbiomed_hor = "data/result/round2/cea/accuracy/dataset/tbiomed/horizontal/tbiomed_dataset.csv"
+R2_cea_dataset_json_tbiomed_hor = "data/json/Round2/cea/accuracy/tbiomed/horizontal/train_cea_tbiomed_hor.jsonl"
 
 ## tbiodov Horizontal
+R2_cea_target_tbiodiv_hor = "data/csv/semtab2024/AcuracyTrack/Round2/tbiodivLarge/horizontal/gt/cea_gt.csv"
+R2_cea_tbiodiv_hor_target = "data/csv/semtab2024/AcuracyTrack/Round2/tbiodivLarge/horizontal/targets/cea_targets.csv"
+R2_cea_dataset_table_tbiodiv_hor = "data/csv/semtab2024/AcuracyTrack/Round2/tbiodivLarge/horizontal/tables"
+R2_cea_tbiodiv_hor = "data/result/round2/cea/accuracy/annotate/tbiodiv/horizontal/tbiodiv_cea.csv"
+R2_cea_dataset_tbiodiv_hor = "data/result/round2/cea/accuracy/dataset/tbiodiv/horizontal/tbiodiv_dataset.csv"
+R2_cea_dataset_json_tbiodiv_hor = "data/json/Round2/cea/accuracy/tbiodiv/horizontal/train_cea_tbiodiv_hor.jsonl"
+
 
 """ ==========RA task==========="""
 ## tbiomed Horizontal
+R2_ra_target_tbiomed_hor = "data/csv/semtab2024/AcuracyTrack/Round2/tbiomedicalLarge/horizontal/gt/ra_gt.csv"
+R2_ra_tbiomed_hor_target = "data/csv/semtab2024/AcuracyTrack/Round2/tbiomedicalLarge/horizontal/targets/ra_targets.csv"
+R2_ra_dataset_table_tbiomed_hor = "data/csv/semtab2024/AcuracyTrack/Round2/tbiomedicalLarge/horizontal/tables"
+R2_ra_tbiomed_hor = "data/result/round2/ra/annotate/tbiomed/tbiomed_ra_annotated.csv"
+R2_ra_dataset_tbiomed_hor = "data/result/round2/ra/dataset/tbiomed/tbiomed_dataset_ra.csv"
+R2_ra_dataset_json_tbiomed_hor = "data/json/Round2/ra/tbiomed/tbiomed_ra.jsonl"
 
-## tbiodov Horizontal
+## tbiodiv Horizontal
+R2_ra_target_tbiodiv_hor = "data/csv/semtab2024/AcuracyTrack/Round2/tbiodivLarge/horizontal/gt/ra_gt.csv"
+R2_ra_tbiodiv_hor_target = "data/csv/semtab2024/AcuracyTrack/Round2/tbiodivLarge/horizontal/targets/ra_targets.csv"
+R2_ra_dataset_table_tbiodiv_hor = "data/csv/semtab2024/AcuracyTrack/Round2/tbiodivLarge/horizontal/tables"
+R2_ra_tbiodiv_hor = "data/result/round2/ra/annotate/tbiodiv/tbiodiv_ra_annotated.csv"
+R2_ra_dataset_tbiodiv_hor = "data/result/round2/ra/dataset/tbiodiv/ra_tbiodiv_dataset.csv"
+R2_ra_dataset_json_tbiodiv_hor = "data/json/Round2/ra/tbiodiv/tbiodiv_ra.jsonl"
+
+
 
 
 
@@ -356,8 +408,8 @@ test_cta_dataset_wikidata_24 = "data/result/cta/dataset/2024/accuracy/wikidata/w
 test_cta_target_wikidata_24 = "data/csv/tables/semtab2024/AcuracyTrack/wikidata/Test/targets/cta_targets.csv"
 
 R2_test_cta_dataset_table_path_wikidata_24 = "data/csv/semtab2024/AcuracyTrack/Round2/Wikidata/tables"
-R2_test_cta_wikidata_24 = "data/result/round2/cea/accuracy/wikidata/annotate/wikidata.csv"
-R2_test_cta_dataset_wikidata_24 = "ddata/result/round2/cea/accuracy/wikidata/dataset/wikidata_dataset_24_test.csv"
+R2_test_cta_wikidata_24 = "data/result/round2/cta/accuracy/wikidata/annotate/wikidata.csv"
+R2_test_cta_dataset_wikidata_24 = "data/result/round2/cta/dataset/wikidata/wikidata_dataset_24_test.csv"
 R2_test_cta_target_wikidata_24 = "data/csv/semtab2024/AcuracyTrack/Round2/Wikidata/targets/cta_targets.csv"
 
 
@@ -481,35 +533,35 @@ cpa_target_wikidata_24 = "data/csv/tables/semtab2024/AcuracyTrack/wikidata/Valid
 cpa_wikidata_target_24 = "data/csv/tables/semtab2024/AcuracyTrack/wikidata/Valid/targets/cpa_targets.csv"
 cpa_dataset_table_path_wikidata_24 = "data/csv/tables/semtab2024/AcuracyTrack/wikidata/Valid/tables"
 cpa_wikidata_24 = "data/result/cpa/annotate/wikidata/wikidata_cpa_24.csv"
-cpa_dataset_wikidata_24 = "data/result/cpa/dataset/wikidata/wikidata_dataset_cpa_24.csv"
+cpa_dataset_wikidata_24 = "dataset/cpa/wikidata/wikidata_dataset_cpa_24.csv"
 
 """ tbiomed entity"""
 cpa_target_tbiomed_entity = "data/csv/tables/semtab2024/AcuracyTrack/tbiomedical2/entity/val/gt/cpa_gt.csv"
 cpa_tbiomed_entity_target = "data/csv/tables/semtab2024/AcuracyTrack/tbiomedical2/entity/val/targets/cpa_targets.csv"
 cpa_dataset_table_tbiomed_entity = "data/csv/tables/semtab2024/AcuracyTrack/tbiomedical2/entity/val/tables"
 cpa_tbiomed_entity = "data/result/cpa/annotate/tbiomed/entity/tbiomed_cpa.csv"
-cpa_dataset_tbiomed_entity = "data/result/cpa/dataset/tbiomed/entity/tbiomed_cpa_dataset.csv"
+cpa_dataset_tbiomed_entity = "dataset/cpa/tbiomed/entity/tbiomed_cpa_dataset.csv"
 
 """ tbiomed Horizontal"""
 cpa_target_tbiomed_hor = "data/csv/tables/semtab2024/AcuracyTrack/tbiomedical2/horizontal/val/gt/cpa_gt.csv"
 cpa_tbiomed_hor_target = "data/csv/tables/semtab2024/AcuracyTrack/tbiomedical2/horizontal/val/targets/cpa_targets.csv"
 cpa_dataset_table_tbiomed_hor = "data/csv/tables/semtab2024/AcuracyTrack/tbiomedical2/horizontal/val/tables"
 cpa_tbiomed_hor = "data/result/cpa/annotate/tbiomed/horizontal/tbiomed_cpa.csv"
-cpa_dataset_tbiomed_hor = "data/result/cpa/dataset/tbiomed/horizontal/tbiomed_dataset_cpa.csv"
+cpa_dataset_tbiomed_hor = "dataset/cpa/tbiomed/horizontal/tbiomed_dataset_cpa.csv"
 
 """ tbiodiv entity"""
 cpa_target_tbiodiv_entity = "data/csv/tables/semtab2024/AcuracyTrack/tbiodiv2/entity/val/gt/cpa_gt.csv"
 cpa_tbiodiv_entity_target = "data/csv/tables/semtab2024/AcuracyTrack/tbiodiv2/entity/val/targets/cpa_targets.csv"
 cpa_dataset_table_tbiodiv_entity = "data/csv/tables/semtab2024/AcuracyTrack/tbiodiv2/entity/val/tables"
 cpa_tbiodiv_entity = "data/result/cpa/annotate/tbiodiv/entity/tbiodiv_cpa.csv"
-cpa_dataset_tbiodiv_entity = "data/result/cpa/dataset/tbiodiv/entity/tbiodiv_dataset_cpa.csv"
+cpa_dataset_tbiodiv_entity = "dataset/cpa/tbiodiv/entity/tbiodiv_dataset_cpa.csv"
 
 """ tbiodiv Horizontal"""
 cpa_target_tbiodiv_hor = "data/csv/tables/semtab2024/AcuracyTrack/tbiodiv2/horizontal/val/gt/cpa_gt.csv"
 cpa_tbiodiv_hor_target = "data/csv/tables/semtab2024/AcuracyTrack/tbiodiv2/horizontal/val/targets/cpa_targets.csv"
 cpa_dataset_table_tbiodiv_hor = "data/csv/tables/semtab2024/AcuracyTrack/tbiodiv2/horizontal/val/tables"
 cpa_tbiodiv_hor = "data/result/cpa/annotate/tbiodiv/horizontal/tbiodiv_cpa.csv"
-cpa_dataset_tbiodiv_hor = "data/result/cpa/dataset/tbiodiv/horizontal/tbiodiv_dataset_cpa.csv"
+cpa_dataset_tbiodiv_hor = "dataset/cpa/tbiodiv/horizontal/tbiodiv_dataset_cpa.csv"
 
 """ ===============
     CPA TEST TASK 2024 semtab challenge

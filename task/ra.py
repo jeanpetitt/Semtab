@@ -84,7 +84,7 @@ class RATask:
                     list_cell_selected = []
                     for index, row in _file.iloc[0:].iterrows():
                         noNanElemenent = row[1:]
-                        noNanElemenent = set([str(x) for x in noNanElemenent if (not isinstance(x, float) and not is_date(str(x)) and not is_number(str(x)) and is_valid_string(str(x)) and not contains_html_tags(str(x)) and not 'http' in str(x))])
+                        noNanElemenent = [str(x) for x in noNanElemenent if (not isinstance(x, float) and not is_date(str(x)) and not is_number(str(x)) and is_valid_string(str(x)) and not contains_html_tags(str(x)) and not ('http' and "%") in str(x))]
                         # print(noNanElemenent)
                         # noNanElemenent = ','.join(noNanElemenent)
                         # noNanElemenent = noNanElemenent.split(",")
@@ -117,9 +117,11 @@ class RATask:
         header=True,
         is_train=True
     ):
-        """ 
-            This function take two csv file which are almost same and compare the rows of the two files
-            in order to create a new file that is same of the csv file 1
+        """ _summary_
+                This function take two csv file which are almost same and compare the rows of the two files
+                in order to create a new file that is same of the csv file 1
+        Args:
+            header(str): Optional
         """
         _raw_dataset, _target = self.buildDataset(
             header=header
@@ -144,6 +146,8 @@ class RATask:
                         match_found = True
                         if is_train:
                             row2.append(row1[2])
+                        else:
+                            row2.append("NIL")
                         updated_data.append(row2)
                         # print(f"Row {row1} it is in CSV2")
                         break         
@@ -157,8 +161,9 @@ class RATask:
 
     def _csv_to_jsonl(self, csv_path, json_path):
         """ 
-            csv_path: path to csv file
-            json_path: path to json file
+            Args:
+                csv_path: path to csv file
+                json_path: path to json file
         """
         df = self.openCSV(csv_path)
         datas = []
@@ -198,6 +203,12 @@ class RATask:
     
     
     def compute_max_token(self, prompt_length, max_new_token):
+        """_summary_
+
+        Args:
+            prompt_length (int): _description_
+            max_new_token (int): _description_
+        """
         max_returned_tokens = max_new_token + prompt_length
         print("Prompt length:", prompt_length)
         assert max_returned_tokens <= self.context_length, (
@@ -206,6 +217,19 @@ class RATask:
         )
     
     def inference(self, model_id, user_input=None, temperature=0.82, frequency_penalty=0, presence_penalty=0, max_tokens=256):
+        """_summary_
+
+        Args:
+            model_id (str): _description_
+            user_input (str, optional): _description_. Defaults to None.
+            temperature (float, optional): _description_. Defaults to 0.82.
+            frequency_penalty (int, optional): _description_. Defaults to 0.
+            presence_penalty (int, optional): _description_. Defaults to 0.
+            max_tokens (int, optional): _description_. Defaults to 256.
+
+        Returns:
+            wikidata_uri: This function ruturn a wikidata uri for a given recording passed in input
+        """
         chatBot = "Hi, I'm semantic annotation Agent. What can i do to help you today."
         if user_input is None:
             user_input = input('User: \n')
@@ -253,8 +277,19 @@ class RATask:
         return uri
     
     
-    def _annotate(self, model, split=0):
-        filed = self.output_dataset
+    def _annotate(self, model, path=None, split=0):
+        """_summary_
+
+        Args:
+            model (_type_): _description_
+            path (_type_, optional): _description_. Defaults to None.
+            split (int, optional): _description_. Defaults to 0.
+        """
+        if not path:
+            filed = self.output_dataset
+        else:
+            filed = path
+        
         with open(self.target_file_to_annotate, "r") as csv_file:
             target_reader = csv.reader(csv_file)
             target_data = [row for row in target_reader]

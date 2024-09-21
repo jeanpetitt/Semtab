@@ -159,6 +159,8 @@ class CTATask:
                         match_found = True
                         if is_train:
                             row2.append(row1[2])
+                        else: 
+                            row2.append("NIL")
                         updated_data.append(row2)
                         # print(f"Row {row1} it is in CSV2")
                         break         
@@ -434,8 +436,19 @@ class CTATask:
         print(f"the correct Text of {text} is {corrected_text}")
         return corrected_text
     
-    def _annotate(self, model, split=0, is_combine_approach=False):
-        filed = filed = self.output_dataset
+    def _annotate(self, model, path=None, split=0, is_combine_approach=False):
+        """_summary_
+
+        Args:
+            model (_type_): _description_
+            path (_type_, optional): _description_. Defaults to None.
+            split (int, optional): _description_. Defaults to 0.
+            is_combine_approach (bool, optional): _description_. Defaults to False.
+        """
+        if not path:
+            filed = self.output_dataset
+        else:
+            filed = path
         header_cta = ["tab_id", "col_id", "annotation"]
         
         with open(self.target_file_to_annotate, "r") as csv_file:

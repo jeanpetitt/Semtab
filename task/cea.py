@@ -142,7 +142,7 @@ class CEATask:
             is_vertical=is_vertical
         )
         # _raw_dataset, _target = self.raw_output_dataset, self.target_file
-        csv.field_size_limit(1000000)
+        csv.field_size_limit(20000000)
         with open(_target, 'r') as file1, open(_raw_dataset, 'r') as file2:
             with open(self.output_dataset, 'w', newline='') as updated_file:
                 writer = csv.writer(updated_file)
@@ -415,8 +415,12 @@ class CEATask:
         return corrected_text
     
     
-    def _annotate(self, model, comma_in_cell=False, col_before_row=True, split=0, is_symbolic=False, is_context=False, is_llm=True):
-        filed = self.output_dataset
+    def _annotate(self, model, path=None, comma_in_cell=False, col_before_row=True, split=0, is_symbolic=False, is_context=False, is_llm=True):
+        if not path:
+            filed = self.output_dataset
+        else:
+            filed = path
+        
         if col_before_row:
             header_cea = ["tab_id", "col_id", "row_id", "entity"]
         else:

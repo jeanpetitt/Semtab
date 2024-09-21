@@ -303,6 +303,61 @@ class CPATask:
                 writer = csv.writer(updated_file)
                 writer.writerows(updated_data)       
             print("Comparison completed. Updated CSV2 saved as 'updated_csv2.csv'.")
+    
+    def _csv_to_jsonl(self, csv_path, json_path):
+        """ 
+            csv_path: path to csv file
+            json_path: path to json file
+        """
+        df = self.openCSV(csv_path)
+        datas = []
+        
+        for i in range(len(df['col_label'])):
+            # print(df['tab_id'][i])
+            value_property = ""
+            try:         
+                value_property = df['col_label'][i]
+            except:
+                value_property = [df['col_label'][i]]
+            uri = df['entity'][i]
+            
+            prompt_input = f"Please which wikidata property has this valuee: {value_property}"
+            if len(prompt_input) >= 2048:
+                print(len(prompt_input))
+            max_returned_token = self.compute_max_token(len(prompt_input), 0)
+            
+            # while not max_returned_token:
+            #     prompt_input = eval(prompt_input[61:])[-1]
+            #     prompt_input = "Please which wikidata property has this value: " + str(prompt_input)
+            #     print(len(prompt_input))
+            #     max_returned_token = self.compute_max_token(len(prompt_input), 0)
+
+            datas.append(
+                {
+                    "messages":  [
+                        {
+                            "role": "system", 
+                            "content": "Hi, I'm semantic annotation Agent. What can i do to help you today."
+                        },
+                        {
+                            "role": "user", 
+                            "content": prompt_input
+                        },      
+                        {
+                            "role": "assistant", 
+                            "content": f"""{{"value_property":  "{value_property}", "uri": "{uri}"}}"""
+                        }
+                    ]
+                }
+            )
+ 
+        print(datas[:3])
+        with open(json_path, 'w') as f:
+            for data in datas:
+                json.dump(data, f)
+                f.write('\n')
+        
+        return datas
             
     def is_number(self, string):
         return re.match(r"^[+-]?\d+(\.\d+)?$", str(string)) is not None
@@ -461,8 +516,11 @@ class CPATask:
     
     # specifici case concerning 
     
-    def _annotate(self, model, split=0, is_entity=False, is_horizontal=False):
-        filed = self.output_dataset
+    def _annotate(self, model, path=None, split=0, is_entity=False, is_horizontal=False):
+        if not path:
+            filed = self.output_dataset
+        else:
+            filed = path
 
         with open(self.target_file_to_annotate, "r") as csv_file:
             target_reader = csv.reader(csv_file)
