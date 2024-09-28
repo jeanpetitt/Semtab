@@ -35,6 +35,60 @@ def is_valid_format(s):
     pattern = r"^\w+\[.*\]$"
     return bool(re.match(pattern, s))
 
+def correct_json_string(expression: str) -> str:
+    stack = []
+    result = []
+    inside_quotes = False
+    escaped = False
+
+    # Parcourir chaque caractère de la chaîne
+    for char in expression:
+        # Gérer les caractères échappés
+        if char == "\\" and not escaped:
+            result.append(char)
+            escaped = True
+            continue
+
+        # Vérifier si on est à l'intérieur des guillemets
+        if char == '"' and not escaped:
+            inside_quotes = not inside_quotes  # Alterner l'état à chaque guillemet
+            result.append(char)
+            continue
+        
+        escaped = False  # Réinitialiser l'échappement après chaque caractère
+
+        # Gérer les crochets et les parenthèses si on n'est pas dans une chaîne de caractères
+        if not inside_quotes:
+            if char == '[':
+                stack.append(char)
+                result.append(char)
+            elif char == ']':
+                if stack and stack[-1] == '[':
+                    stack.pop()  # Correspondance correcte
+                else:
+                    result.append('[')  # Ajouter un crochet ouvrant s'il manque
+                result.append(char)
+            else:
+                result.append(char)
+        else:
+            result.append(char)
+
+    # Ajouter les crochets ou parenthèses manquants après la fin de la chaîne
+    while stack:
+        opening = stack.pop()
+        if opening == '[':
+            result.append(']')
+    
+    corrected_string = ''.join(result)
+
+    # Corriger les guillemets doubles à l'intérieur des crochets pour qu'ils deviennent des guillemets simples
+    corrected_string = re.sub(r'\["(.*?)"\]', r"['\1']", corrected_string)
+
+    # Séparer les mots collés avec des majuscules
+    corrected_string = re.sub(r'(?<!^)(?=[A-Z])', ' ', corrected_string)
+
+    return corrected_string
+
 def is_valid_string(s):
     # This pattern checks that the string does not contain , @, #, or $ in invalid positions
     pattern = r"^[^?@#$][^\?@#$]*[^?@#$]?$"
@@ -45,5 +99,28 @@ def decole_url_file(url_file: str):
     filename = url_file.split("/")[-1]
     decoded_filename = unquote(filename)
     return decoded_filename
+
+def is_numerical(object: list):
+    new_object = []
+    for item in object:
+        if isinstance(item, int) or isinstance(item, float):
+            item = str(item)
+            if "-" in item:
+                print(item)
+                new_object.append(item)
+            else:
+                item = f"+{item}"
+                item = item.split(".")
+                if len(item) == 2:
+                    if item[1] == "0":
+                        item = item[0]
+                    else:
+                        item = ".".join(item)
+                else:
+                    item = "".join(item)
+                new_object.append(item)
+        else:
+            new_object.append(item)
+    return new_object
 
 # print(decole_url_file("http://commons.wikimedia.org/wiki/Special:FilePath/JAS%2039%20Gripen%20momument%20L%C3%A5ngholmen%202.jpg"))

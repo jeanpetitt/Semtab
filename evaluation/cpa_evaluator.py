@@ -24,14 +24,14 @@ class CPA_Evaluator:
         gt = pd.read_csv(self.answer_file_path, delimiter=',', names=['tab_id', 'obj_col_id', 'property'],
                         dtype={'tab_id': str, 'obj_col_id': str, 'property': str}, keep_default_na=False)
         for index, row in gt.iterrows():
-            cols = '%s %s %s' % (row['tab_id'], row['obj_col_id'])
+            cols = '%s %s' % (row['tab_id'], row['obj_col_id'])
             gt_cols_pro[cols] = row['property']
 
         annotated_cols, correct_cols = set(), set()
         sub = pd.read_csv(submission_file_path, delimiter=',', names=['tab_id', 'obj_col_id', 'property'],
                         dtype={'tab_id': str, 'obj_row_id': str, 'property': str}, keep_default_na=False)
         for index, row in sub.iterrows():
-            cols = '%s %s %s' % (row['tab_id'], row['obj_col_id'])
+            cols = '%s %s' % (row['tab_id'], row['obj_col_id'])
             if cols in gt_cols_pro:
                 if cols in annotated_cols:
                     # continue

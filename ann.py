@@ -265,38 +265,58 @@ def process_file(input_file, output_file, split=0):
                             if previous_row:
                                 if int(previous_row[2]) == 0:
                                     label_identifier = correct_spelling(context[0])
-                                    id = openUrl(label_identifier)
-                                    if id:
-                                        identifier = "".join(id).split("/")[-1]
-                                        current_properties = get_wikidata_properties(identifier)
-                                        action(
-                                            current_properties=current_properties,
-                                            label=label,
-                                            data_reader=data_reader,
-                                            row=row,
-                                            previous_row=previous_row,
-                                            header=header,
-                                            i=i,
-                                            output_file=output_file
-                                        )
+                                    entity_ids = openUrl(label_identifier)
+                                    if len(entity_ids) == 1:
+                                        if id:
+                                            identifier = "".join(id).split("/")[-1]
+                                            current_properties = get_wikidata_properties(identifier)
+                                            action(
+                                                current_properties=current_properties,
+                                                label=label,
+                                                data_reader=data_reader,
+                                                row=row,
+                                                previous_row=previous_row,
+                                                header=header,
+                                                i=i,
+                                                output_file=output_file
+                                            )
+                                        else:
+                                            if previous_row:
+                                                if int(previous_row[2]) == 0:
+                                                    label_identifier = context[0].split("(")[0].strip()
+                                                    id = openUrl(label_identifier)
+                                                    if id:
+                                                        identifier = "".join(id).split("/")[-1]
+                                                        current_properties = get_wikidata_properties(identifier)
+                                                        action(
+                                                            current_properties=current_properties,
+                                                            label=label,
+                                                            data_reader=data_reader,
+                                                            row=row,
+                                                            previous_row=previous_row,
+                                                            header=header,
+                                                            i=i,
+                                                            output_file=output_file
+                                                        ) 
                                     else:
-                                        if previous_row:
-                                            if int(previous_row[2]) == 0:
-                                                label_identifier = context[0].split("(")[0].strip()
-                                                id = openUrl(label_identifier)
-                                                if id:
-                                                    identifier = "".join(id).split("/")[-1]
-                                                    current_properties = get_wikidata_properties(identifier)
-                                                    action(
-                                                        current_properties=current_properties,
-                                                        label=label,
-                                                        data_reader=data_reader,
-                                                        row=row,
-                                                        previous_row=previous_row,
-                                                        header=header,
-                                                        i=i,
-                                                        output_file=output_file
-                                                    )                                                                                                  
+                                        id = check_entity_properties_cea(
+                                            entity_ids=entity_ids,
+                                            property_values=context,
+                                            label_current=label
+                                        )
+                                        if id:
+                                            identifier = id
+                                            current_properties = get_wikidata_properties(identifier)
+                                            action(
+                                                current_properties=current_properties,
+                                                label=label,
+                                                data_reader=data_reader,
+                                                row=row,
+                                                previous_row=previous_row,
+                                                header=header,
+                                                i=i,
+                                                output_file=output_file
+                                            )                                                                                                
                     else:
                         found = False
                         for prop, qid in current_properties.items():
@@ -324,6 +344,7 @@ def process_file(input_file, output_file, split=0):
                             if entity_ids:
                                 if len(entity_ids) == 1:
                                     id = ''.join(entity_ids)
+                                    identifier = id
                                     current_properties = get_wikidata_properties(identifier)
                                     action(
                                         current_properties=current_properties,
@@ -359,38 +380,81 @@ def process_file(input_file, output_file, split=0):
                                 if previous_row:
                                     if int(previous_row[2]) == 0:
                                         label_identifier = correct_spelling(context[0])
-                                        id = openUrl(label_identifier)
-                                        if id:
-                                            identifier = "".join(id).split("/")[-1]
-                                            current_properties = get_wikidata_properties(identifier)
-                                            action(
-                                                current_properties=current_properties,
-                                                label=label,
-                                                data_reader=data_reader,
-                                                row=row,
-                                                previous_row=previous_row,
-                                                header=header,
-                                                i=i,
-                                                output_file=output_file
-                                            )
+                                        entity_ids = openUrl(label_identifier)
+                                        if entity_ids:                                           
+                                            if len(entity_ids) == 1:
+                                                id = ''.join(entity_ids)
+                                                identifier = id
+                                                current_properties = get_wikidata_properties(identifier)
+                                                action(
+                                                    current_properties=current_properties,
+                                                    label=label,
+                                                    data_reader=data_reader,
+                                                    row=row,
+                                                    previous_row=previous_row,
+                                                    header=header,
+                                                    i=i,
+                                                    output_file=output_file
+                                                )
+                                            else:
+                                                id = check_entity_properties_cea(
+                                                    entity_ids=entity_ids,
+                                                    property_values=context,
+                                                    label_current=label
+                                                )
+                                                if id:
+                                                    identifier = id
+                                                    current_properties = get_wikidata_properties(identifier)
+                                                    action(
+                                                        current_properties=current_properties,
+                                                        label=label,
+                                                        data_reader=data_reader,
+                                                        row=row,
+                                                        previous_row=previous_row,
+                                                        header=header,
+                                                        i=i,
+                                                        output_file=output_file
+                                                    )
+                                                
                                         else:
                                             if previous_row:
                                                 if int(previous_row[2]) == 0:
                                                     label_identifier = context[0].split("(")[0].strip()
                                                     id = openUrl(label_identifier)
                                                     if id:
-                                                        identifier = "".join(id).split("/")[-1]
-                                                        current_properties = get_wikidata_properties(identifier)
-                                                        action(
-                                                            current_properties=current_properties,
-                                                            label=label,
-                                                            data_reader=data_reader,
-                                                            row=row,
-                                                            previous_row=previous_row,
-                                                            header=header,
-                                                            i=i,
-                                                            output_file=output_file
-                                                        )
+                                                        if len(id) == 1:
+                                                            id = ''.join(id)
+                                                            identifier = id
+                                                            current_properties = get_wikidata_properties(identifier)
+                                                            action(
+                                                                current_properties=current_properties,
+                                                                label=label,
+                                                                data_reader=data_reader,
+                                                                row=row,
+                                                                previous_row=previous_row,
+                                                                header=header,
+                                                                i=i,
+                                                                output_file=output_file
+                                                            )
+                                                        else:
+                                                            id = check_entity_properties_cea(
+                                                                entity_ids=entity_ids,
+                                                                property_values=context,
+                                                                label_current=label
+                                                            )
+                                                            if id:
+                                                                identifier = id
+                                                                current_properties = get_wikidata_properties(identifier)
+                                                                action(
+                                                                    current_properties=current_properties,
+                                                                    label=label,
+                                                                    data_reader=data_reader,
+                                                                    row=row,
+                                                                    previous_row=previous_row,
+                                                                    header=header,
+                                                                    i=i,
+                                                                    output_file=output_file
+                                                                )
                     
                 else:
                     current_properties = get_wikidata_properties(identifier)
@@ -399,23 +463,9 @@ def process_file(input_file, output_file, split=0):
                         id = openUrl(str(context[0]).strip(".").strip())                             
                         # print(id)
                         if id:
-                            identifier = "".join(id).split("/")[-1]
-                            current_properties = get_wikidata_properties(identifier)
-                            action(
-                                current_properties=current_properties,
-                                label=label,
-                                data_reader=data_reader,
-                                row=row,
-                                previous_row=previous_row,
-                                header=header,
-                                i=i,
-                                output_file=output_file
-                            )
-                        else:
-                            label_identifier = correct_spelling(context[0])
-                            id = openUrl(label_identifier)
-                            if id:
-                                identifier = "".join(id).split("/")[-1]
+                            if len(id) == 1:
+                                id = ''.join(id)
+                                identifier = id
                                 current_properties = get_wikidata_properties(identifier)
                                 action(
                                     current_properties=current_properties,
@@ -428,23 +478,100 @@ def process_file(input_file, output_file, split=0):
                                     output_file=output_file
                                 )
                             else:
+                                id = check_entity_properties_cea(
+                                    entity_ids=entity_ids,
+                                    property_values=context,
+                                    label_current=label
+                                )
+                                if id:
+                                    identifier = id
+                                    current_properties = get_wikidata_properties(identifier)
+                                    action(
+                                        current_properties=current_properties,
+                                        label=label,
+                                        data_reader=data_reader,
+                                        row=row,
+                                        previous_row=previous_row,
+                                        header=header,
+                                        i=i,
+                                        output_file=output_file
+                                    )
+                        else:
+                            label_identifier = correct_spelling(context[0])
+                            id = openUrl(label_identifier)
+                            if id:
+                                if len(id) == 1:
+                                    id = ''.join(id)
+                                    identifier = id
+                                    current_properties = get_wikidata_properties(identifier)
+                                    action(
+                                        current_properties=current_properties,
+                                        label=label,
+                                        data_reader=data_reader,
+                                        row=row,
+                                        previous_row=previous_row,
+                                        header=header,
+                                        i=i,
+                                        output_file=output_file
+                                    )
+                                else:
+                                    id = check_entity_properties_cea(
+                                        entity_ids=entity_ids,
+                                        property_values=context,
+                                        label_current=label
+                                    )
+                                    if id:
+                                        identifier = id
+                                        current_properties = get_wikidata_properties(identifier)
+                                        action(
+                                            current_properties=current_properties,
+                                            label=label,
+                                            data_reader=data_reader,
+                                            row=row,
+                                            previous_row=previous_row,
+                                            header=header,
+                                            i=i,
+                                            output_file=output_file
+                                        )
+                            else:
                                 if previous_row:
                                     if int(previous_row[2]) == 0:
                                         label_identifier = context[0].split("(")[0].strip()
                                         id = openUrl(label_identifier)
                                         if id:
-                                            identifier = "".join(id).split("/")[-1]
-                                            current_properties = get_wikidata_properties(identifier)
-                                            action(
-                                                current_properties=current_properties,
-                                                label=label,
-                                                data_reader=data_reader,
-                                                row=row,
-                                                previous_row=previous_row,
-                                                header=header,
-                                                i=i,
-                                                output_file=output_file
-                                            )
+                                            if len(id) == 1:
+                                                id = ''.join(id)
+                                                identifier = id
+                                                current_properties = get_wikidata_properties(identifier)
+                                                action(
+                                                    current_properties=current_properties,
+                                                    label=label,
+                                                    data_reader=data_reader,
+                                                    row=row,
+                                                    previous_row=previous_row,
+                                                    header=header,
+                                                    i=i,
+                                                    output_file=output_file
+                                                )
+                                            else:
+                                                id = check_entity_properties_cea(
+                                                    entity_ids=entity_ids,
+                                                    property_values=context,
+                                                    label_current=label
+                                                )
+                                                if id:
+                                                    identifier = id
+                                                    current_properties = get_wikidata_properties(identifier)
+                                                    action(
+                                                        current_properties=current_properties,
+                                                        label=label,
+                                                        data_reader=data_reader,
+                                                        row=row,
+                                                        previous_row=previous_row,
+                                                        header=header,
+                                                        i=i,
+                                                        output_file=output_file
+                                                    )
                                                     
                                                                
             print(f"=======================================================")
@@ -461,4 +588,4 @@ def process_file(input_file, output_file, split=0):
             i += 1
         # writer.writerows(data_reader)
 
-process_file('dataset/llm_test_cea_dataset.csv', 'output1.csv', split=25494)
+process_file('dataset/llm_test_cea_dataset.csv', 'output5.csv', split=58943)

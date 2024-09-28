@@ -56,6 +56,7 @@ ra_model_finetuned = "ft:gpt-3.5-turbo-0613:tib:annotator-ra:9azlDasr"
 td_model_finetuned = "ft:gpt-3.5-turbo-0613:tib:annotator-td:9bYhZGqb"
 td_model_finetuned_1 = "ft:gpt-4o-mini-2024-07-18:tib:gpt-annotator-td-01-24:A8pg9aTY"
 td_model_finetuned_2 = "ft:gpt-4o-mini-2024-07-18:tib:annotator-td-02-24:A92bjRqv"
+cpa_model_finetuned = "ft:gpt-4o-mini-2024-07-18:tib:annotator-cpa-01-24:A9XLWpi0"
 
 """ ===============
     CEA TASK 2023 and 2024 semtab challenge

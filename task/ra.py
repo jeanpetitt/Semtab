@@ -14,29 +14,71 @@ class RATask:
 
     def  __init__(
         self, 
-        output_dataset,
-        raw_output_dataset, 
-        target_file, table_path, 
-        file_annotated,
-        target_file_to_annotate
+        dataset_name,
+        output_dataset = None,
+        target_file = None, 
+        table_path = None, 
+        file_annotated = None,
+        target_file_gt = None
     ):
         """_summary_
 
         Args:
-            output_dataset (file): csv dataset file final
-            raw_output_dataset (file): raw csv dataset final that contain all cell in table without considering
-            target.
-            target_file (file): target csv file
-            table_path (path): list of tables to make dataset
-            file_annotated (file): the path of annotatedfile
+            dataset_name (_type_): _description_
+            output_dataset (_type_, optional): _description_. Defaults to None.
+            target_file (_type_, optional): _description_. Defaults to None.
+            table_path (_type_, optional): _description_. Defaults to None.
+            file_annotated (_type_, optional): _description_. Defaults to None.
+            target_file_gt (_type_, optional): _description_. Defaults to None.
         """
         self.output_dataset = output_dataset
-        self.raw_output_dataset = raw_output_dataset
         self.target_file = target_file
         self.table_path = table_path
         self.file_annotated = file_annotated
         self.context_length = 4096
-        self.target_file_to_annotate = target_file_to_annotate
+        self.target_file_gt = target_file_gt
+        self.dataset_name = dataset_name
+    
+    def get_dataset_name(self):
+        return self.dataset_name
+        
+    def get_dataset_path(self):
+        return self.output_dataset
+    
+    def get_annotated_file(self):
+        return self.file_annotated
+    
+    def set_annotated_file_path(self, path):
+        self.file_annotated = path
+        return self.file_annotated
+    
+    def set_dataset_path(self, dataset_path):
+        self.output_dataset = dataset_path
+        return self.output_dataset
+    
+    def set_target_file_path(self, path):
+        """_summary_
+
+        Args:
+            path (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        self.target_file = path
+        return self.target_file
+    
+    def set_table_path(self, path):
+        """_summary_
+
+        Args:
+            path (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        self.table_path = path
+        return self.table_path
         
     def openCSV(self, path):
         """ 
@@ -63,14 +105,18 @@ class RATask:
             file: return target and raw dataset
         """
         # get name csv file inside of target_output_dataset without duplication
-        list_file = getNameCsvFile(path=self.target_file)
+        if self.target_file_gt:
+            list_file = getNameCsvFile(path=self.target_file_gt)
+        elif self.target_file:
+            list_file = getNameCsvFile(path=self.target_file)
+        else:
+            list_file = os.listdir(self.table_path)
         # open output_dataset cea file to write inside 
-        with open(self.raw_output_dataset, "w+") as csv_file:
+        with open(self.output_dataset, "w+") as csv_file:
             writer = csv.writer(csv_file, delimiter=",")
             # writer.writerow(header_cea)
             # get filename from each file in dataset
             for filed in list_file:
-                filed += ".csv"
                 if filed.endswith(".csv"):
                     filename = filed.split(".")[0]
                     if not header:
@@ -110,7 +156,7 @@ class RATask:
                 else:
                     print("it is not csv file")
             csv_file.close()
-        return self.raw_output_dataset, self.target_file
+        return self.output_dataset
     
     def _makeDataset(
         self,
@@ -123,42 +169,49 @@ class RATask:
         Args:
             header(str): Optional
         """
-        _raw_dataset, _target = self.buildDataset(
+        _raw_dataset = self.buildDataset(
             header=header
         )
-        # _raw_dataset, _target = self.raw_output_dataset, self.target_file
-        with open(_target, 'r') as file1, open(_raw_dataset, 'r') as file2:
-            _reader1 = csv.reader(file1)
-            _reader2 = csv.reader(file2)
-            
-            csv1_data = [row for row in _reader1]
-            csv2_data = [row for row in _reader2]     
-            
-            updated_data = []
-            if is_train:
-                updated_data.append(["tab_id", "row_id", "record", "uri"])
-            else:
-                updated_data.append(["tab_id", "row_id", "record"])          
-            for row1 in csv1_data:
-                match_found = False
-                for row2 in csv2_data:
-                    if row1[:2] == row2[:2]:
-                        match_found = True
-                        if is_train:
-                            row2.append(row1[2])
-                        else:
-                            row2.append("NIL")
-                        updated_data.append(row2)
-                        # print(f"Row {row1} it is in CSV2")
-                        break         
-                if match_found == False:
-                    print(f"Row {row1} it is not in CSV2")
-            
+        # _raw_dataset = self.raw_output_dataset
+        if self.target_file_gt:
+            with open(self.target_file_gt, 'r') as file1, open(_raw_dataset, 'r') as file2:
+                _reader1 = csv.reader(file1)
+                _reader2 = csv.reader(file2)
+                
+                csv1_data = [row for row in _reader1]
+                csv2_data = [row for row in _reader2]     
+                
+                updated_data = []
+                if is_train:
+                    updated_data.append(["tab_id", "row_id", "record", "uri"])
+                else:
+                    updated_data.append(["tab_id", "row_id", "record"])          
+                for row1 in csv1_data:
+                    # print(row1, self.target_file_gt, self.target_file)
+                    match_found = False
+                    for row2 in csv2_data:
+                        if row1[:2] == row2[:2]:
+                            match_found = True
+                            if is_train:
+                                row2.append(row1[2])
+                            else:
+                                row2.append("NIL")
+                            updated_data.append(row2)
+                            # print(f"Row {row1} it is in CSV2")
+                            break         
+                    if match_found == False:
+                        print(f"Row {row1} it is not in CSV2") 
             with open(self.output_dataset, 'w', newline='') as updated_file:
                 writer = csv.writer(updated_file)
                 writer.writerows(updated_data)       
             print("Comparison completed. Updated CSV2 saved as 'updated_csv2.csv'.")
-
+        else:
+            df = pd.read_csv(self.output_dataset)
+            datas = df.values.tolist()
+            with open(self.output_dataset, 'w', newline='') as updated_file:
+                writer = csv.writer(updated_file)
+                writer.writerows(datas)
+            return self.output_dataset
     def _csv_to_jsonl(self, csv_path, json_path):
         """ 
             Args:
@@ -286,38 +339,68 @@ class RATask:
             split (int, optional): _description_. Defaults to 0.
         """
         if not path:
-            filed = self.output_dataset
+            dataset_path = self.output_dataset
         else:
-            filed = path
-        
-        with open(self.target_file_to_annotate, "r") as csv_file:
-            target_reader = csv.reader(csv_file)
-            target_data = [row for row in target_reader]
+            dataset_path = path
+        if self.target_file_gt:
+            with open(self.target_file_gt, "r") as csv_file:
+                target_reader = csv.reader(csv_file)
+                target_data = [row for row in target_reader]
+                with open(self.file_annotated, 'w', newline='') as updated_file:
+                    writer = csv.writer(updated_file)
+                    # writer.writerow(header_cea)
+                    # check if it is csv file
+                    if dataset_path.endswith(".csv"):
+                        print(dataset_path)
+                        df = pd.read_csv(dataset_path) # open file with pandas
+                        i = split
+                        for data in target_data[split:]:
+                            updated_cea_data = []   # at each iteration in reader_data, empty the list
+                            label =  df['record'][i]     
+            
+                            user_input = f"Please Give the  wikidata URI of the this recording: {label}"                
+                            # check uri
+                            result = self.inference(model_id=model, user_input=user_input)                                 
+                            # add result of annation   
+                            data.append(result)
+                            updated_cea_data.append(data)
+                            i += 1  
+                                
+                            #  write data in update cea file
+                            writer.writerows(updated_cea_data)
+                            print("*************************")
+                            print(f"Row {i} annotated")
+                            print("*************************")
+                        
+                        else:
+                            print("it is not csv file")
+        else:
             with open(self.file_annotated, 'w', newline='') as updated_file:
                 writer = csv.writer(updated_file)
                 # writer.writerow(header_cea)
                 # check if it is csv file
-                if filed.endswith(".csv"):
-                    print(filed)
-                    _file = pd.read_csv(filed) # open file with pandas
+                if dataset_path.endswith(".csv"):
+                    print(dataset_path)
+                    df = pd.read_csv(dataset_path) # open file with pandas
+                    datas = df.values.tolist()
                     i = split
-                    for data in target_data[split:]:
-                        updated_cea_data = []   # at each iteration in reader_data, empty the list
-                        label =  _file['record'][i]     
-         
+                    for data in datas[split:]:
+                        # print(data)
+                        updated_data = []   # at each iteration in reader_data, empty the list
+                        label =  df['record'][i]     
+        
                         user_input = f"Please Give the  wikidata URI of the this recording: {label}"                
                         # check uri
                         result = self.inference(model_id=model, user_input=user_input)                                 
                         # add result of annation   
                         data.append(result)
-                        updated_cea_data.append(data)
-                        i += 1  
-                            
+                        updated_data.extend([data[0], data[1], data[-1]])
+                        i += 1                              
                         #  write data in update cea file
-                        writer.writerows(updated_cea_data)
+                        print(updated_data)
+                        writer.writerow(updated_data)
                         print("*************************")
                         print(f"Row {i} annotated")
-                        print("*************************")
-                    
+                        print("*************************")                
                     else:
                         print("it is not csv file")

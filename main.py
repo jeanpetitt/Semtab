@@ -1,4 +1,4 @@
-from object_task import *
+# from object_task import *
 from evaluation.cea_evaluator import CEA_Evaluator
 from finetuning.utils import inference, combineJsonFile
 from evaluation.cta_evaluator import CTA_Evaluator
@@ -35,7 +35,7 @@ if __name__ == "__main__":
             """ ==================================================="""
             
             """=================CTA task========================="""
-            R2_test_cta_task_wikidata_24._makeDataset(is_train=False)
+            # R2_test_cta_task_wikidata_24._makeDataset(is_train=False)
             # R2_cta_task_tbiodiv_hor._makeDataset()
             # R2_cta_task_tbiomed_hor._makeDataset()
             
@@ -257,17 +257,17 @@ if __name__ == "__main__":
             # )
             print("\n")
         elif choice == "5":
-            gpttuner.fineTuningJobID(
-                training_path="RA_Conversational2024_train.jsonl", 
-                validation_file_path="RA_Conversational2024_val.jsonl"
-            )
+            # gpttuner.fineTuningJobID(
+            #     training_path="RA_Conversational2024_train.jsonl", 
+            #     validation_file_path="RA_Conversational2024_val.jsonl"
+            # )
             # gpttuner.fineTuningJobID(
             #     training_path="train_llm1.jsonl",
             #     # validation_file_path="val_llm1.jsonl"
             # )
             print("\n")
         elif choice == "6":
-            inference(model=ra_model_finetuned)
+            # inference(model=ra_model_finetuned)
             print("\n")
         elif choice == "7":
             """ CEA TASK"""
@@ -376,7 +376,7 @@ if __name__ == "__main__":
             """========== TD Task============"""
             # R2_test_td_task_tbiodiv_entity._annotate(model=td_model_finetuned_2)
             # R2_test_td_task_tbiodiv_hor._annotate(model=td_model_finetuned_1)
-            R2_test_td_task_tbiomed_entity._annotate(model=td_model_finetuned_2)
+            # R2_test_td_task_tbiomed_entity._annotate(model=td_model_finetuned_2)
             # R2_test_td_task_tbiomed_hor._annotate(model=td_model_finetuned_1)
             # test_td_task_tbiodiv_entity._annotate(model=td_model_finetuned, split=13793)
             # test_td_task_tbiomed_entity._annotate(model=td_model_finetuned, split=9510)
@@ -400,8 +400,8 @@ if __name__ == "__main__":
             # _client_payload["submission_file_path"] = cea_tfood_entity
             # aicrowd_evaluator = CEA_Evaluator(cea_target_tfood_entity)  # ground truth
             
-            _client_payload["submission_file_path"] = cea_wikidata_24
-            aicrowd_evaluator = CEA_Evaluator(cea_target_wikidata_24)  # ground truth
+            # _client_payload["submission_file_path"] = cea_wikidata_24
+            # aicrowd_evaluator = CEA_Evaluator(cea_target_wikidata_24)  # ground truth
             
             # _client_payload["submission_file_path"] = cea_tbiodiv_entity
             # aicrowd_evaluator = CEA_Evaluator(cea_target_tbiodiv_entity)  # ground truth
@@ -421,9 +421,9 @@ if __name__ == "__main__":
             
             """ ================CTA=========================="""
             # wikidata 24
-            _client_payload["submission_file_path"] = cta_wikidata_1_24
-            # _client_payload["submission_file_path"] = cta_wikidata_24
-            aicrowd_evaluator = CTA_Evaluator(cta_target_wikidata_24)
+            # _client_payload["submission_file_path"] = cta_wikidata_1_24
+            # # _client_payload["submission_file_path"] = cta_wikidata_24
+            # aicrowd_evaluator = CTA_Evaluator(cta_target_wikidata_24)
 
             # tbiomed hor
             # _client_payload["submission_file_path"] = cta_tbiomed_hor
@@ -438,14 +438,14 @@ if __name__ == "__main__":
             # _client_payload["submission_file_path"] = ra_tbiodiv_hor
             # aicrowd_evaluator = RA_Evaluator(ra_target_tbiodiv_hor)  # ground truth
             
-            _client_payload["submission_file_path"] = td_tbiodiv_entity
-            aicrowd_evaluator = TD_Evaluator(td_target_tbiodiv_entity)  # ground truth
+            # _client_payload["submission_file_path"] = td_tbiodiv_entity
+            # aicrowd_evaluator = TD_Evaluator(td_target_tbiodiv_entity)  # ground truth
             
-            _client_payload["submission_file_path"] = R2_td_tbiodiv_entity
-            aicrowd_evaluator = TD_Evaluator(R2_td_target_tbiodiv_entity)
+            # _client_payload["submission_file_path"] = R2_td_tbiodiv_entity
+            # aicrowd_evaluator = TD_Evaluator(R2_td_target_tbiodiv_entity)
             
-            _client_payload["submission_file_path"] = R2_td_tbiomed_entity
-            aicrowd_evaluator = TD_Evaluator(R2_td_target_tbiomed_entity)
+            # _client_payload["submission_file_path"] = R2_td_tbiomed_entity
+            # aicrowd_evaluator = TD_Evaluator(R2_td_target_tbiomed_entity)
             
             # _client_payload["submission_file_path"] = R2_td_tbiodiv_hor
             # aicrowd_evaluator = TD_Evaluator(R2_td_target_tbiodiv_hor)
@@ -465,8 +465,8 @@ if __name__ == "__main__":
             # _client_payload["submission_file_path"] = cpa_wikidata_24
             # aicrowd_evaluator = CPA_Evaluator(cpa_target_wikidata_24)  # ground truth
             
-            # _client_payload["submission_file_path"] = cpa_tbiomed_hor
-            # aicrowd_evaluator = CPA_Evaluator(cpa_target_tbiomed_hor)  # ground truth
+            _client_payload["submission_file_path"] = "results/annotate/annotate_tbiomed_entity_cpa_train.csv"
+            aicrowd_evaluator = CPA_Evaluator('data/csv/semtab2024/AcuracyTrack/Round2/tbiomedicalLarge/entity/gt/cpa_gt.csv', is_entity=True)  # ground truth
             
             # _client_payload["submission_file_path"] = R2_ra_tbiodiv_hor
             # aicrowd_evaluator = RA_Evaluator(R2_ra_target_tbiodiv_hor)  # ground truth

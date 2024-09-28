@@ -1,11 +1,11 @@
 import json
 import multiprocessing
 import re
-import openai
+import openai, os
 from .helper import getNameCsvFile
 import csv
 import pandas as pd
-import random,math
+import random
 from .symbolic.api import get_properties, check_entity_properties_cpa
 from .utils import *
 
@@ -17,30 +17,71 @@ class CPATask:
 
     def  __init__(
         self, 
-        output_dataset,
-        raw_output_dataset, 
-        target_file, table_path, 
-        file_annotated,
-        target_file_to_annotate
+        dataset_name,
+        output_dataset = None,
+        target_file = None, 
+        table_path = None, 
+        file_annotated = None,
+        target_file_gt = None
     ):
         """_summary_
 
         Args:
-            output_dataset (file): csv dataset file final
-            raw_output_dataset (file): raw csv dataset final that contain all cell in table without considering
-            target.
-            target_file (file): target csv file
-            table_path (path): list of tables to make dataset
-            file_annotated (file): the path of annotatedfile
+            dataset_name (_type_): _description_
+            output_dataset (_type_, optional): _description_. Defaults to None.
+            target_file (_type_, optional): _description_. Defaults to None.
+            table_path (_type_, optional): _description_. Defaults to None.
+            file_annotated (_type_, optional): _description_. Defaults to None.
+            target_file_gt (_type_, optional): _description_. Defaults to None.
         """
         self.output_dataset = output_dataset
-        self.raw_output_dataset = raw_output_dataset
         self.target_file = target_file
         self.table_path = table_path
         self.file_annotated = file_annotated
         self.context_length = 4096
-        self.target_file_to_annotate = target_file_to_annotate
+        self.target_file_gt = target_file_gt
+        self.dataset_name = dataset_name
+    def get_dataset_name(self):
+        return self.dataset_name
         
+    def get_dataset_path(self):
+        return self.output_dataset
+    
+    def get_annotated_file(self):
+        return self.file_annotated
+    
+    def set_annotated_file_path(self, path):
+        self.file_annotated = path
+        return self.file_annotated
+    
+    def set_dataset_path(self, dataset_path):
+        self.output_dataset = dataset_path
+        return self.output_dataset
+    
+    def set_target_file_path(self, path):
+        """_summary_
+
+        Args:
+            path (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        self.target_file = path
+        return self.target_file
+    
+    def set_table_path(self, path):
+        """_summary_
+
+        Args:
+            path (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        self.table_path = path
+        return self.table_path
+      
     def openCSV(self, path):
         """ 
             path: path to csv file
@@ -88,13 +129,6 @@ class CPATask:
 
         return result
     
-    # def contains_html_tags(self, text):
-    #     # Define a regex pattern for HTML tags
-    #     html_tag_pattern = re.compile(r'<[^>]+>')
-    #     # Search for the pattern in the input text
-    #     if html_tag_pattern.search(text):
-    #         return True
-    #     return False
     
     def buildDataset(
         self,
@@ -115,9 +149,14 @@ class CPATask:
             file: return target and raw dataset
         """
         # get name csv file inside of target_output_dataset without duplication
-        list_file = getNameCsvFile(path=self.target_file)
+        if self.target_file_gt:
+            list_file = getNameCsvFile(path=self.target_file_gt)
+        elif self.target_file:
+            list_file = getNameCsvFile(path=self.target_file)
+        else:
+            list_file = os.listdir(self.table_path)
         # open output_dataset cea file to write inside 
-        with open(self.raw_output_dataset, "w+") as csv_file:
+        with open(self.output_dataset, "w+") as csv_file:
             writer = csv.writer(csv_file, delimiter=",")
             # writer.writerow(header_cea)
             # get filename from each file in dataset
@@ -242,7 +281,7 @@ class CPATask:
                 else:
                     print("it is not csv file")
             csv_file.close()
-        return self.raw_output_dataset, self.target_file
+        return self.output_dataset
     
     def _makeDataset(
         self,
@@ -255,54 +294,65 @@ class CPATask:
             This function take two csv file which are almost same and compare the rows of the two files
             in order to create a new file that is same of the csv file 1
         """
-        _raw_dataset, _target = self.buildDataset(
+        _raw_dataset = self.buildDataset(
             header=header,
             is_entity=is_entity,
             is_horizontal=is_horizontal
         )
-        # _raw_dataset, _target = self.raw_output_dataset, self.target_file
-        with open(_target, 'r') as file1, open(_raw_dataset, 'r') as file2:
-            _reader1 = csv.reader(file1)
-            _reader2 = csv.reader(file2)
-            csv.field_size_limit(200000)
-            csv1_data = [row for row in _reader1]
-            csv2_data = [row for row in _reader2] 
-            
-            updated_data = []
-            if is_entity:
-                updated_data.append(["tab_id", "col_j", "col_label", "list_col", "entity"])
-            else:
-                updated_data.append(["tab_id", "col0", "col_j", "col_label", "list_col", "entity"])
-            for row1 in csv1_data:
-                match_found = False
-                for row2 in csv2_data:
-                    if is_entity:
-                        if row1[:2] == row2[:2]:
-                            match_found = True
-                            if is_train:
-                                row2.append(row1[2])
-                            else:
-                                row2.append("NIL")
-                            updated_data.append(row2)
-                            # print(f"Row {row1} it is in CSV2")
-                            break    
-                    else:
-                        if row1[:3] == row2[:3]:
-                            match_found = True
-                            if is_train:
-                                row2.append(row1[3])
-                            else:
-                                row2.append("NIL")
-                            updated_data.append(row2)
-                            # print(f"Row {row1} it is in CSV2")
-                            break      
-                if match_found == False:
-                    print(f"Row {row1} it is not in CSV2")
-            
+        # _raw_dataset, = self.output_dataset
+        """
+            function returns a new dataset if the target file exists else returns datasets already built
+        """
+        if self.target_file_gt:
+            with open(self.target_file_gt, 'r') as file1, open(_raw_dataset, 'r') as file2:
+                _reader1 = csv.reader(file1)
+                _reader2 = csv.reader(file2)
+                csv.field_size_limit(200000)
+                csv1_data = [row for row in _reader1]
+                csv2_data = [row for row in _reader2] 
+                
+                updated_data = []
+                if is_entity:
+                    updated_data.append(["tab_id", "col_j", "col_label", "list_col", "entity"])
+                else:
+                    updated_data.append(["tab_id", "col0", "col_j", "col_label", "list_col", "entity"])
+                for row1 in csv1_data:
+                    match_found = False
+                    for row2 in csv2_data:
+                        if is_entity:
+                            if row1[:2] == row2[:2]:
+                                match_found = True
+                                if is_train:
+                                    row2.append(row1[2])
+                                else:
+                                    row2.append("NIL")
+                                updated_data.append(row2)
+                                # print(f"Row {row1} it is in CSV2")
+                                break    
+                        else:
+                            if row1[:3] == row2[:3]:
+                                match_found = True
+                                if is_train:
+                                    row2.append(row1[3])
+                                else:
+                                    row2.append("NIL")
+                                updated_data.append(row2)
+                                # print(f"Row {row1} it is in CSV2")
+                                break      
+                    if match_found == False:
+                        print(f"Row {row1} it is not in CSV2")
+                
+                with open(self.output_dataset, 'w', newline='') as updated_file:
+                    writer = csv.writer(updated_file)
+                    writer.writerows(updated_data)       
+                print("Comparison completed. Updated CSV2 saved as 'updated_csv2.csv'.")
+        else:
+            df = pd.read_csv(self.output_dataset)
+            datas = df.values.tolist()
             with open(self.output_dataset, 'w', newline='') as updated_file:
                 writer = csv.writer(updated_file)
-                writer.writerows(updated_data)       
-            print("Comparison completed. Updated CSV2 saved as 'updated_csv2.csv'.")
+                writer.writerows(datas)
+            return self.output_dataset
     
     def _csv_to_jsonl(self, csv_path, json_path):
         """ 
@@ -311,7 +361,6 @@ class CPATask:
         """
         df = self.openCSV(csv_path)
         datas = []
-        
         for i in range(len(df['col_label'])):
             # print(df['tab_id'][i])
             value_property = ""
@@ -324,14 +373,6 @@ class CPATask:
             prompt_input = f"Please which wikidata property has this valuee: {value_property}"
             if len(prompt_input) >= 2048:
                 print(len(prompt_input))
-            max_returned_token = self.compute_max_token(len(prompt_input), 0)
-            
-            # while not max_returned_token:
-            #     prompt_input = eval(prompt_input[61:])[-1]
-            #     prompt_input = "Please which wikidata property has this value: " + str(prompt_input)
-            #     print(len(prompt_input))
-            #     max_returned_token = self.compute_max_token(len(prompt_input), 0)
-
             datas.append(
                 {
                     "messages":  [
@@ -359,16 +400,6 @@ class CPATask:
         
         return datas
             
-    def is_number(self, string):
-        return re.match(r"^[+-]?\d+(\.\d+)?$", str(string)) is not None
-    
-    def is_date(self, string):
-        split_slash = len(str(string.split("/")))
-        split_tiret = len(str(string.split("-")))
-        if split_slash == 3 or split_tiret == 3:
-            if self.is_number(split_tiret[0]) or self.is_number(split_tiret[0][1:]) or  self.is_number(split_slash[0]):
-                return True
-        return False  
     
     def compute_max_token(self, prompt_length, max_new_token):
         max_returned_tokens = max_new_token + prompt_length
@@ -391,42 +422,34 @@ class CPATask:
         message_input = conversation.copy()
         prompt = [{"role": "system", "content": chatBot}]
         message_input.insert(0, prompt[0])
+        completion = openai.chat.completions.create(
+            model=model_id,
+            temperature=temperature,
+            frequency_penalty=frequency_penalty,
+            top_p=1,
+            presence_penalty=presence_penalty,
+            seed=42,
+            messages=message_input,
+            max_tokens=max_tokens
+        )
+        # Extract the chatbot response from API response
+        chat_response = completion.choices[0].message.content
+        # chat_response = correct_expression(chat_response)
+        # Update conversation
+        conversation.append({"role": "assistant", "content": chat_response})
+        print(conversation)
         try:
-            completion = openai.chat.completions.create(
-                    model=model_id,
-                    temperature=temperature,
-                    frequency_penalty=frequency_penalty,
-                    top_p=1,
-                    presence_penalty=presence_penalty,
-                    seed=42,
-                    messages=message_input,
-                    max_tokens=max_tokens
-                )
-            
-            # Extract the chatbot response from API response
-            chat_response = completion.choices[0].message.content
-                
-            # Update conversation
-            conversation.append({"role": "assistant", "content": chat_response})
-            try:
-                
-                result = json.loads(chat_response)
-                label = result['recording']
-                uri = result['uri']
-                # print(f"The wikidata ofthis recording {label} is {uri}")
-            except:
-                uri = chat_response.split(":")[-1]
-                uri = "http:" + uri.split('"')[0]
-                print(chat_response)
-                if len(uri.lower().split("q")) != 2:
-                    return ""
-                # print(f"The wikidata of this recording is {uri}")
+            result = json.loads(chat_response)
+            uri = result['uri']
+            return uri
         except:
-            uri = "NIL"
+            result = chat_response.split('uri": ')
+            uri = result[-1].strip('"').split('}')[0].strip(" ").strip('"')
         return uri
+    
     def correct_spelling(self, text):
         prompt = f"Don't argument in your answer. Correct the spelling of this text :\"{text}\""
-        model = "gpt-4o"
+        model = "gpt-4o-mini"
         message_input = [{"role": "user", "content": prompt}]
         completion = openai.chat.completions.create(
             model=model,
@@ -446,28 +469,6 @@ class CPATask:
             corrected_text = corrected_text[3].split(".")[0].strip()
         print(f"The correct spelling of {text} is {corrected_text}")
         return corrected_text
-    def is_numerical(self, object: list):
-        new_object = []
-        for item in object:
-            if isinstance(item, int) or isinstance(item, float):
-                item = str(item)
-                if "-" in item:
-                    print(item)
-                    new_object.append(item)
-                else:
-                    item = f"+{item}"
-                    item = item.split(".")
-                    if len(item) == 2:
-                        if item[1] == "0":
-                            item = item[0]
-                        else:
-                            item = ".".join(item)
-                    else:
-                        item = "".join(item)
-                    new_object.append(item)
-            else:
-                new_object.append(item)
-        return new_object
     
     def get_property_entities(self, entity_id=None, prop_values=None, label=None, is_horizontal=False, index=None, target_label=None):
         # if not self.is_number(label) or not self.is_date(label):     
@@ -516,7 +517,7 @@ class CPATask:
     
     # specifici case concerning 
     
-    def _annotate(self, model, path=None, split=0, is_entity=False, is_horizontal=False):
+    def _annotate_symbolique(self, model, path=None, split=0, is_entity=False, is_horizontal=False):
         if not path:
             filed = self.output_dataset
         else:
@@ -707,5 +708,88 @@ class CPATask:
                                 writer.writerows(updated_cea_data)
                         
                                                                       
+                    else:
+                        print("it is not csv file")
+
+    def _annotate(self, model, path=None, split=0, is_entity=False):
+        """_summary_
+
+        Args:
+            model (_type_): _description_
+            path (_type_, optional): _description_. Defaults to None.
+            split (int, optional): _description_. Defaults to 0.
+        """
+        if not path:
+            dataset_path = self.output_dataset
+        else:
+            dataset_path = path
+        if self.target_file_gt:
+            with open(self.target_file_gt, "r") as csv_file:
+                target_reader = csv.reader(csv_file)
+                target_data = [row for row in target_reader]
+                with open(self.file_annotated, 'w', newline='') as updated_file:
+                    writer = csv.writer(updated_file)
+                    # writer.writerow(header_cea)
+                    # check if it is csv file
+                    if dataset_path.endswith(".csv"):
+                        print(dataset_path)
+                        df = pd.read_csv(dataset_path) # open file with pandas
+                        i = split
+                        for data in target_data[split:]:
+                            updated_cea_data = []   # at each iteration in reader_data, empty the list
+                            label =  df['col_label'][i]    
+                            user_input = f"Please which wikidata property has this valuee: {label}"                
+                            # check uri
+                            result = self.inference(model_id=model, user_input=user_input)                                 
+                            # add result of annation   
+                            data.append(result)
+                            updated_cea_data.append(data)
+                                
+                            #  write data in update cea file
+                            writer.writerows(updated_cea_data)
+                            print("*************************")
+                            print(f"col {i} annotated")
+                            print(f"label col={label}, => prop_id={result.split("/")[-1]}")
+                            print("*************************\n")
+                            i += 1  
+                                        
+                        else:
+                            print("it is not csv file")
+        else:
+            with open(self.file_annotated, 'w', newline='') as updated_file:
+                writer = csv.writer(updated_file)
+                # writer.writerow(header_cea)
+                # check if it is csv file
+                if dataset_path.endswith(".csv"):
+                    print(dataset_path)
+                    df = pd.read_csv(dataset_path) # open file with pandas
+                    datas = df.values.tolist()
+                    i = split
+                    for data in datas[split:]:
+                        # print(data)
+                        updated_data = []   # at each iteration in reader_data, empty the list
+                        label =  df['col_label'][i]
+                        # label = correct_json_string(label).strip(" ")
+                        # label = label.split("::")[0].strip('"').strip(" ")
+        
+                        user_input = f"Please which wikidata property has this valuee: {label}"                
+                        # check uri
+                        result = self.inference(model_id=model, user_input=user_input)                                 
+                        # add result of annation   
+                        data.append(result)
+                        if is_entity:
+                            # tab_id, col_i, property
+                            updated_data.extend([data[0], data[1], data[-1]])
+                        else:
+                            # tab_id, col0, colj, property
+                            updated_data.extend([data[0], data[1], data[2], data[-1]])
+                        #  write data in update cea file
+                        print(updated_data)
+                        writer.writerow(updated_data)
+                        print("*************************")
+                        print(f"col {i} annotated")
+                        print(f"label col={label}, => prop_id={result.split("/")[-1]}")
+                        print("*************************\n")               
+                        i += 1                              
                     else:
                         print("it is not csv file")

@@ -16,16 +16,17 @@ def getNameCsvFile(path):
     df = pd.read_csv(path, header=None)   
     col1 = df[0]
     data = []
-    cols_not = [] # contains no duplicate data
+    not_duplicate_tab_id = [] # contains no duplicate data
     # store each of the first column in a list
     for i in col1:
         data.append(i) 
     # remove duplicate key
     for i in data[0:]:
-        if i not in cols_not:
-            cols_not.append(i)
+        if i not in not_duplicate_tab_id:
+            i += ".csv"
+            not_duplicate_tab_id.append(i)
     
-    return cols_not
+    return not_duplicate_tab_id
 
 
 def getAllCellInTableColByBCol(table, is_vertical, comma_in_cell):
