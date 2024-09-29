@@ -5,6 +5,7 @@ python-dotenv==1.0.1
 editdistance==0.8.1
 SPARQLWrapper==2.0.0
 datasets==2.20.0
+flask
 # llm libraries
 # transformers==4.43.3
 wandb==0.17.5
