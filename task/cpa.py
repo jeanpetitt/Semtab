@@ -790,9 +790,10 @@ class CPATask:
                         #  write data in update cea file
                         print(updated_data)
                         writer.writerow(updated_data)
+                        result = result.split("/")[-1]
                         print("*************************")
                         print(f"col {i} annotated")
-                        print(f"label col={label}, => prop_id={result.split("/")[-1]}")
+                        print(f"label col={label}, => prop_id={result}")
                         print("*************************\n")               
                         i += 1                              
                     else:
