@@ -17,7 +17,7 @@ class CPATask:
 
     def  __init__(
         self, 
-        dataset_name,
+        dataset_name = "cpa",
         output_dataset = None,
         target_file = None, 
         table_path = None, 
@@ -161,7 +161,6 @@ class CPATask:
             # writer.writerow(header_cea)
             # get filename from each file in dataset
             for filed in list_file:
-                filed += ".csv"
                 if filed.endswith(".csv"):
                     filename = filed.split(".")[0]
                     print(filename)
@@ -366,11 +365,15 @@ class CPATask:
             value_property = ""
             try:         
                 value_property = df['col_label'][i]
+                value_property = correct_string(str(value_property))
+                value_property = value_property.split("::")[0].strip('"').strip(" ")
             except:
                 value_property = [df['col_label'][i]]
+                value_property = correct_string(value_property)
+                value_property = value_property.split("::")[0].strip('"').strip(" ")
             uri = df['entity'][i]
             
-            prompt_input = f"Please which wikidata property has this valuee: {value_property}"
+            prompt_input = f"Please which wikidata property has this value: {value_property}"
             if len(prompt_input) >= 2048:
                 print(len(prompt_input))
             datas.append(

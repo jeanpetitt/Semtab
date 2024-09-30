@@ -7,12 +7,12 @@ from task.td import TDTask
 from path_data.utils import *
 
 gpttuner = Gpt3FinetuningProcess(
-    name="annotator-ra-01-24", 
-    base_model="gpt-4o-mini-2024-07-18",
+    name="annotator-cpa-02-24", 
+    base_model=cpa_model_finetuned,
     # base_model=td_model_finetuned_1,
     hyperparameter = {
-        'n_epochs': 6,
-        'batch_size': 3,
+        'n_epochs': 10,
+        'batch_size': 2,
         "learning_rate_multiplier": 8,
     },
 )
@@ -291,96 +291,96 @@ test_cta_task_tbiodiv_hor = CTATask(
     ===============
 """
 cpa_task_wikidata_24 = CPATask(
-    raw_output_dataset=raw_cpa,
+    dataset_name="wikidata_24",
     output_dataset=cpa_dataset_wikidata_24,
-    target_file=cpa_target_wikidata_24,
+    target_file_gt=cpa_target_wikidata_24,
+    target_file=cpa_wikidata_target_24,
     table_path=cpa_dataset_table_path_wikidata_24,
-    file_annotated=cpa_wikidata_24,
-    target_file_to_annotate=cpa_wikidata_target_24
+    file_annotated=cpa_wikidata_24
 )
 
 cpa_task_tbiodiv_entity = CPATask(
-    raw_output_dataset=raw_cpa,
+    dataset_name="tbiodiv_entity",
     output_dataset=cpa_dataset_tbiodiv_entity,
-    target_file=cpa_target_tbiodiv_entity,
+    target_file_gt=cpa_target_tbiodiv_entity,
     table_path=cpa_dataset_table_tbiodiv_entity,
     file_annotated=cpa_tbiodiv_entity,
-    target_file_to_annotate=cpa_tbiodiv_entity_target
+    target_file=cpa_tbiodiv_entity_target
 )
 
 cpa_task_tbiomed_entity = CPATask(
-    raw_output_dataset=raw_cpa,
+    dataset_name="tbiomed_entity",
     output_dataset=cpa_dataset_tbiomed_entity,
-    target_file=cpa_target_tbiomed_entity,
+    target_file_gt=cpa_target_tbiomed_entity,
     table_path=cpa_dataset_table_tbiomed_entity,
     file_annotated=cpa_tbiomed_entity,
-    target_file_to_annotate=cpa_tbiomed_entity_target
+    target_file=cpa_tbiomed_entity_target
 )
 
 cpa_task_tbiomed_hor = CPATask(
-    raw_output_dataset=raw_cpa,
+    dataset_name="tbiomed_hor",
     output_dataset=cpa_dataset_tbiomed_hor,
-    target_file=cpa_target_tbiomed_hor,
+    target_file_gt=cpa_target_tbiomed_hor,
     table_path=cpa_dataset_table_tbiomed_hor,
     file_annotated=cpa_tbiomed_hor,
-    target_file_to_annotate=cpa_tbiomed_hor_target
+    target_file=cpa_tbiomed_hor_target
 )
 
 cpa_task_tbiodiv_hor = CPATask(
-    raw_output_dataset=raw_cpa,
+    dataset_name="tbiodiv_horizontal",
     output_dataset=cpa_dataset_tbiodiv_hor,
-    target_file=cpa_target_tbiodiv_hor,
+    target_file_gt=cpa_target_tbiodiv_hor,
     table_path=cpa_dataset_table_tbiodiv_hor,
     file_annotated=cpa_tbiodiv_hor,
-    target_file_to_annotate=cpa_tbiodiv_hor_target
+    target_file=cpa_tbiodiv_hor_target
 )
 """ ===============
     CPA TEST 2024 semtab challenge
     ===============
 """
 test_cpa_task_tbiodiv_entity = CPATask(
-    raw_output_dataset=raw_cpa,
+    dataset_name="test_tbiodiv_entity",
     output_dataset=test_cpa_dataset_tbiodiv_entity,
-    target_file=test_cpa_target_tbiodiv_entity,
+    target_file_gt=test_cpa_target_tbiodiv_entity,
     table_path=test_cpa_dataset_table_tbiodiv_entity,
     file_annotated=test_cpa_tbiodiv_entity,
-    target_file_to_annotate=test_cpa_target_tbiodiv_entity
+    target_file=test_cpa_target_tbiodiv_entity
 )
 
 test_cpa_task_tbiomed_entity = CPATask(
-    raw_output_dataset=raw_cpa,
+    dataset_name="test_tbiomed_entity",
     output_dataset=test_cpa_dataset_tbiomed_entity,
-    target_file=test_cpa_target_tbiomed_entity,
+    target_file_gt=test_cpa_target_tbiomed_entity,
     table_path=test_cpa_dataset_table_tbiomed_entity,
     file_annotated=test_cpa_tbiomed_entity,
-    target_file_to_annotate=test_cpa_target_tbiomed_entity
+    target_file=test_cpa_target_tbiomed_entity
 )
 
 test_cpa_task_wikidata_24 = CPATask(
-    raw_output_dataset=raw_cpa,
+    dataset_name="test_wikidata_24",
     output_dataset=test_cpa_dataset_wikidata_24,
-    target_file=test_cpa_target_wikidata_24,
+    target_file_gt=test_cpa_target_wikidata_24,
     table_path=test_cpa_dataset_table_path_wikidata_24,
     file_annotated=test_cpa_wikidata_24,
-    target_file_to_annotate=test_cpa_target_wikidata_24
+    target_file=test_cpa_target_wikidata_24
 )
 
 test_cpa_task_tbiomed_hor = CPATask(
-    raw_output_dataset=raw_cpa,
+    dataset_name="test_tbiomed_horizontal",
     output_dataset=test_cpa_dataset_tbiomed_hor,
-    target_file=test_cpa_target_tbiomed_hor,
+    target_file_gt=test_cpa_target_tbiomed_hor,
     table_path=test_cpa_dataset_table_tbiomed_hor,
     file_annotated=test_cpa_tbiomed_hor,
-    target_file_to_annotate=test_cpa_target_tbiomed_hor
+    target_file=test_cpa_target_tbiomed_hor
 )
 
 test_cpa_task_tbiodiv_hor = CPATask(
-    raw_output_dataset=raw_cpa,
+    dataset_name="test_tbiodiv_horizontal",
     output_dataset=test_cpa_dataset_tbiodiv_hor,
-    target_file=test_cpa_target_tbiodiv_hor,
+    target_file_gt=test_cpa_target_tbiodiv_hor,
     table_path=test_cpa_dataset_table_tbiodiv_hor,
     file_annotated=test_cpa_tbiodiv_hor,
-    target_file_to_annotate=test_cpa_target_tbiodiv_hor
+    target_file=test_cpa_target_tbiodiv_hor
 )
 
 
@@ -390,20 +390,18 @@ test_cpa_task_tbiodiv_hor = CPATask(
     ===============
 """
 ra_task_tbiodiv_hor = RATask(
-    raw_output_dataset=raw_ra,
     output_dataset=ra_dataset_tbiodiv_hor,
-    target_file=ra_target_tbiodiv_hor,
+    target_file_gt=ra_target_tbiodiv_hor,
     table_path=ra_dataset_table_tbiodiv_hor,
     file_annotated=ra_tbiodiv_hor,
-    target_file_to_annotate=ra_tbiodiv_hor_target
+    target_file=ra_tbiodiv_hor_target
 )
 ra_task_tbiomed_hor = RATask(
-    raw_output_dataset=raw_ra,
     output_dataset=ra_dataset_tbiomed_hor,
-    target_file=ra_target_tbiomed_hor,
+    target_file_gt=ra_target_tbiomed_hor,
     table_path=ra_dataset_table_tbiomed_hor,
     file_annotated=ra_tbiomed_hor,
-    target_file_to_annotate=ra_tbiomed_hor_target
+    target_file=ra_tbiomed_hor_target
 )
 
 """ ===============
@@ -411,20 +409,18 @@ ra_task_tbiomed_hor = RATask(
     ===============
 """
 test_ra_task_tbiodiv_hor = RATask(
-    raw_output_dataset=raw_ra,
     output_dataset=test_ra_dataset_tbiodiv_hor,
-    target_file=test_ra_target_tbiodiv_hor,
+    target_file_gt=test_ra_target_tbiodiv_hor,
     table_path=test_ra_dataset_table_tbiodiv_hor,
     file_annotated=test_ra_tbiodiv_hor,
-    target_file_to_annotate=test_ra_target_tbiodiv_hor
+    target_file=test_ra_target_tbiodiv_hor
 )
 test_ra_task_tbiomed_hor = RATask(
-    raw_output_dataset=raw_ra,
     output_dataset=test_ra_dataset_tbiomed_hor,
-    target_file=test_ra_target_tbiomed_hor,
+    target_file_gt=test_ra_target_tbiomed_hor,
     table_path=test_ra_dataset_table_tbiomed_hor,
     file_annotated=test_ra_tbiomed_hor,
-    target_file_to_annotate=test_ra_target_tbiomed_hor
+    target_file=test_ra_target_tbiomed_hor
 )
 
 """ ===============
@@ -583,67 +579,60 @@ R2_test_td_task_tbiodiv_hor = TDTask(
 """=================CPA task========================="""
 # wikidata R2
 R2_test_cpa_task_wikidata_24 = CPATask(
-    raw_output_dataset=R2_raw_cpa,
     output_dataset=R2_test_cpa_dataset_wikidata_24,
-    target_file=R2_test_cpa_target_wikidata_24,
+    target_file_gt=R2_test_cpa_target_wikidata_24,
     table_path=R2_test_cpa_dataset_table_path_wikidata_24,
     file_annotated=R2_test_cpa_wikidata_24,
-    target_file_to_annotate=R2_test_cpa_target_wikidata_24
+    target_file=R2_test_cpa_target_wikidata_24
 )
 
 # tbiomed entity
 R2_test_cpa_task_tbiomed_entity = CPATask(
-    raw_output_dataset=R2_raw_cpa,
     output_dataset=R2_cpa_dataset_tbiomed_entity,
-    target_file=R2_cpa_target_tbiomed_entity,
+    target_file_gt=R2_cpa_target_tbiomed_entity,
     table_path=R2_cpa_dataset_table_tbiomed_entity,
     file_annotated=R2_cpa_tbiomed_entity,
-    target_file_to_annotate=R2_cpa_tbiomed_entity_target
+    target_file=R2_cpa_tbiomed_entity_target
 )
 # tbiodiv entity
 R2_test_cpa_task_tbiodiv_entity = CPATask(
-    raw_output_dataset=R2_raw_cpa,
     output_dataset=R2_cpa_dataset_tbiodiv_entity,
-    target_file=R2_cpa_target_tbiodiv_entity,
+    target_file_gt=R2_cpa_target_tbiodiv_entity,
     table_path=R2_cpa_dataset_table_tbiodiv_entity,
     file_annotated=R2_cpa_tbiodiv_entity,
-    target_file_to_annotate=R2_cpa_tbiodiv_entity_target
+    target_file=R2_cpa_tbiodiv_entity_target
 )
 # tbiomed horizontal
 R2_test_cpa_task_tbiomed_hor = CPATask(
-    raw_output_dataset=R2_raw_cpa,
     output_dataset=R2_cpa_dataset_tbiomed_hor,
-    target_file=R2_cpa_target_tbiomed_hor,
+    target_file_gt=R2_cpa_target_tbiomed_hor,
     table_path=R2_cpa_dataset_table_tbiomed_hor,
     file_annotated=R2_cpa_tbiomed_hor,
-    target_file_to_annotate=R2_cpa_tbiomed_hor_target
+    target_file=R2_cpa_tbiomed_hor_target
 )
 # tbiodiv horizontal
 R2_test_cpa_task_tbiodiv_hor = CPATask(
-    raw_output_dataset=R2_raw_cpa,
     output_dataset=R2_cpa_dataset_tbiodiv_hor,
-    target_file=R2_cpa_target_tbiodiv_hor,
+    target_file_gt=R2_cpa_target_tbiodiv_hor,
     table_path=R2_cpa_dataset_table_tbiodiv_hor,
     file_annotated=R2_cpa_tbiodiv_hor,
-    target_file_to_annotate=R2_cpa_tbiodiv_hor_target
+    target_file=R2_cpa_tbiodiv_hor_target
 )
 
 """=================RA task========================="""
 R2_ra_task_tbiodiv_hor = RATask(
-    raw_output_dataset=R2_raw_ra,
     output_dataset=R2_ra_dataset_tbiodiv_hor,
-    target_file=R2_ra_target_tbiodiv_hor,
+    target_file_gt=R2_ra_target_tbiodiv_hor,
     table_path=R2_ra_dataset_table_tbiodiv_hor,
     file_annotated=R2_ra_tbiodiv_hor,
-    target_file_to_annotate=R2_ra_tbiodiv_hor_target
+    target_file=R2_ra_tbiodiv_hor_target
 )
 R2_ra_task_tbiomed_hor = RATask(
-    raw_output_dataset=R2_raw_ra,
     output_dataset=R2_ra_dataset_tbiomed_hor,
-    target_file=R2_ra_target_tbiomed_hor,
+    target_file_gt=R2_ra_target_tbiomed_hor,
     table_path=R2_ra_dataset_table_tbiomed_hor,
     file_annotated=R2_ra_tbiomed_hor,
-    target_file_to_annotate=R2_ra_tbiomed_hor_target
+    target_file=R2_ra_tbiomed_hor_target
 )
 
 

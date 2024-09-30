@@ -35,7 +35,7 @@ def is_valid_format(s):
     pattern = r"^\w+\[.*\]$"
     return bool(re.match(pattern, s))
 
-def correct_json_string(expression: str) -> str:
+def correct_string(expression: str) -> str:
     stack = []
     result = []
     inside_quotes = False

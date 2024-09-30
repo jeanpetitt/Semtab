@@ -1,4 +1,4 @@
-# from object_task import *
+from object_task import *
 from evaluation.cea_evaluator import CEA_Evaluator
 from finetuning.utils import inference, combineJsonFile
 from evaluation.cta_evaluator import CTA_Evaluator
@@ -141,38 +141,42 @@ if __name__ == "__main__":
             """ llm 2024 """
             """================Round2================"""
             "==============TD task=================="
-            # R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
-            #     csv_path=cpa_dataset_tbiodiv_entity,
-            #     json_path='data/json/Round1/cpa/tbiodiv/entity.jsonl'
-            # )
-            # R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
-            #     csv_path=cpa_dataset_tbiodiv_hor,
-            #     json_path='data/json/Round1/cpa/tbiodiv/hor.jsonl'
-            # )
-            # R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
-            #     csv_path=cpa_dataset_tbiomed_hor,
-            #     json_path='data/json/Round1/cpa/tbiomed/hor.jsonl'
-            # )
-            # R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
-            #     csv_path=cpa_dataset_tbiomed_entity,
-            #     json_path='data/json/Round1/cpa/tbiomed/entity.jsonl'
-            # )
-            # R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
-            #     csv_path=cpa_dataset_wikidata_24,
-            #     json_path='data/json/Round1/cpa/wikidata/wikidata.jsonl'
-            # )
-            # R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
-            #     csv_path=R2_cpa_dataset_tbiomed_entity,
-            #     json_path=R2_cpa_dataset_json_tbiomed_entity
-            # )
-            # R2_test_cpa_task_tbiodiv_hor._csv_to_jsonl(
-            #     csv_path=R2_cpa_dataset_tbiodiv_hor,
-            #     json_path=R2_cpa_dataset_json_tbiodiv_hor
-            # )
-            # R2_test_cpa_task_tbiodiv_hor._csv_to_jsonl(
-            #     csv_path=R2_cpa_dataset_tbiomed_hor,
-            #     json_path=R2_cpa_dataset_json_tbiomed_hor
-            # )
+            R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
+                csv_path=cpa_dataset_tbiodiv_entity,
+                json_path='data/json/Round1/cpa/tbiodiv/entity.jsonl'
+            )
+            R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
+                csv_path=cpa_dataset_tbiodiv_hor,
+                json_path='data/json/Round1/cpa/tbiodiv/hor.jsonl'
+            )
+            R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
+                csv_path=cpa_dataset_tbiomed_hor,
+                json_path='data/json/Round1/cpa/tbiomed/hor.jsonl'
+            )
+            R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
+                csv_path=cpa_dataset_tbiomed_entity,
+                json_path='data/json/Round1/cpa/tbiomed/entity.jsonl'
+            )
+            R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
+                csv_path=cpa_dataset_wikidata_24,
+                json_path='data/json/Round1/cpa/wikidata/wikidata.jsonl'
+            )
+            R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
+                csv_path=R2_cpa_dataset_tbiomed_entity,
+                json_path=R2_cpa_dataset_json_tbiomed_entity
+            )
+            R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
+                csv_path=R2_cpa_dataset_tbiodiv_entity,
+                json_path=R2_cpa_dataset_json_tbiodiv_entity
+            )
+            R2_test_cpa_task_tbiodiv_hor._csv_to_jsonl(
+                csv_path=R2_cpa_dataset_tbiodiv_hor,
+                json_path=R2_cpa_dataset_json_tbiodiv_hor
+            )
+            R2_test_cpa_task_tbiodiv_hor._csv_to_jsonl(
+                csv_path=R2_cpa_dataset_tbiomed_hor,
+                json_path=R2_cpa_dataset_json_tbiomed_hor
+            )
             
             
             # cea_task_llm._csv_to_jsonl(
@@ -257,10 +261,10 @@ if __name__ == "__main__":
             # )
             print("\n")
         elif choice == "5":
-            # gpttuner.fineTuningJobID(
-            #     training_path="RA_Conversational2024_train.jsonl", 
-            #     validation_file_path="RA_Conversational2024_val.jsonl"
-            # )
+            gpttuner.fineTuningJobID(
+                training_path="json dataset/CPA_Conversational2024_train.jsonl", 
+                validation_file_path="json dataset/CPA_Conversational2024_val.jsonl"
+            )
             # gpttuner.fineTuningJobID(
             #     training_path="train_llm1.jsonl",
             #     # validation_file_path="val_llm1.jsonl"
@@ -468,8 +472,8 @@ if __name__ == "__main__":
             _client_payload["submission_file_path"] = "results/annotate/annotate_tbiomed_entity_cpa_train.csv"
             aicrowd_evaluator = CPA_Evaluator('data/csv/semtab2024/AcuracyTrack/Round2/tbiomedicalLarge/entity/gt/cpa_gt.csv', is_entity=True)  # ground truth
             
-            # _client_payload["submission_file_path"] = R2_ra_tbiodiv_hor
-            # aicrowd_evaluator = RA_Evaluator(R2_ra_target_tbiodiv_hor)  # ground truth
+            _client_payload["submission_file_path"] = "results/annotate/annotate_tbiomed_horizontal_cpa_train.csv"
+            aicrowd_evaluator = CPA_Evaluator('data/csv/semtab2024/AcuracyTrack/Round2/tbiomedicalLarge/horizontal/gt/cpa_gt.csv', is_entity=False)  # ground truth
             
             # # Evaluate
             result = aicrowd_evaluator._evaluate(_client_payload)

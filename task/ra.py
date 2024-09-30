@@ -14,7 +14,7 @@ class RATask:
 
     def  __init__(
         self, 
-        dataset_name,
+        dataset_name = "ra",
         output_dataset = None,
         target_file = None, 
         table_path = None, 

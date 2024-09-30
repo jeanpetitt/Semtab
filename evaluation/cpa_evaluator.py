@@ -86,7 +86,13 @@ class CPA_Evaluator:
      to provide meaningful feedback to your users
     """
     _result_object = {
-        "score": main_score,
-        "score_secondary": secondary_score
+        "statistic": {
+            "correct_cpa": len(correct_cols),
+            "annotated_cols": len(annotated_cols),
+            "target_to_annotate": len(gt_cols_pro)
+        },
+        "f1-score": main_score,
+        "precion": secondary_score,
+        "recall": recall
     }
     return _result_object
