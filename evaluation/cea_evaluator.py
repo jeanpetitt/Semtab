@@ -30,6 +30,7 @@ class CEA_Evaluator:
             # print(cell)
             if cell in gt_cell_ent:
                 if cell in annotated_cells:
+                    print(cell)
                     raise Exception("Duplicate cells in the submission file")
                 else:
                     annotated_cells.add(cell)
@@ -38,6 +39,9 @@ class CEA_Evaluator:
                 if annotation in gt_cell_ent[cell]:
                     correct_cells.add(cell)
                     # print(correct_cells)
+        # for x in gt_cell_ent:
+        #     if x not in annotated_cells:
+        #         print(x)
         print("Correct cells:", len(correct_cells), "Cell annotated:", len(annotated_cells), "target cells:", len(gt_cell_ent))
         precision = float(len(correct_cells)) / \
             len(annotated_cells) if len(annotated_cells) > 0 else 0.0

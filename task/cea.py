@@ -1,21 +1,26 @@
-import random
+from .symbolic.api import openUrl, check_entity_properties_cea
 from .helper import getNameCsvFile, getAllCellInTableColByBCol, getAllCellInTableRowByRow, tableToVectROw, tableToVectCol
-import csv, json, os, re
+import random
+import csv
+import json
+import re
+import os
 import pandas as pd
 import numpy as np
 import openai
+from .utils import *
 # from symbolic.api import openUrl
-from .symbolic.api import openUrl, check_entity_properties_cea
 
 class CEATask:
 
     def  __init__(
         self, 
-        output_dataset,
-        raw_output_dataset, 
-        target_file, table_path, 
-        file_annotated,
-        target_file_to_annotate
+        dataset_name = "cea",
+        output_dataset = None,
+        target_file = None, 
+        table_path = None, 
+        file_annotated = None,
+        target_file_gt = None
     ):
         """_summary_
 
@@ -28,12 +33,53 @@ class CEATask:
             file_annotated (file): the path of annotatedfile
         """
         self.output_dataset = output_dataset
-        self.raw_output_dataset = raw_output_dataset
         self.target_file = target_file
         self.table_path = table_path
         self.file_annotated = file_annotated
-        self.context_length = 2048
-        self.target_file_to_annotate = target_file_to_annotate
+        self.context_length = 4096
+        self.target_file_gt = target_file_gt
+        self.dataset_name = dataset_name
+    
+    def get_dataset_name(self):
+        return self.dataset_name
+        
+    def get_dataset_path(self):
+        return self.output_dataset
+    
+    def get_annotated_file(self):
+        return self.file_annotated
+    
+    def set_annotated_file_path(self, path):
+        self.file_annotated = path
+        return self.file_annotated
+    
+    def set_dataset_path(self, dataset_path):
+        self.output_dataset = dataset_path
+        return self.output_dataset
+    
+    def set_target_file_path(self, path):
+        """_summary_
+
+        Args:
+            path (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        self.target_file = path
+        return self.target_file
+    
+    def set_table_path(self, path):
+        """_summary_
+
+        Args:
+            path (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        self.table_path = path
+        return self.table_path
         
     def openCSV(self, path):
         """ 
@@ -45,33 +91,23 @@ class CEATask:
     
     def buildDataset(
         self,
-        header=True,
-        col_before_row=True,
-        comma_in_cell=False,
-        transpose=False,
-        is_vertical=False
+        header,
+        col_before_row,
+        comma_in_cell,
+        transpose,
+        is_vertical
     ):
-        """_summary_
-
-        Args:
-            header (bool, optional): true if table have header and False else. Defaults to True.
-            col_before_row (bool, optional): true if the structure of target is 
-            [tab_id col_id row_id]. Defaults to True.
-            comma_in_cell (bool, optional): True if the data in a cell are consider as
-            multi entities. Defaults to False.
-
-        Returns:
-            file: return target and raw dataset
-        """
         # get name csv file inside of target_output_dataset without duplication
-        list_file = getNameCsvFile(path=self.target_file)
+        if self.target_file_gt:
+            list_file = getNameCsvFile(path=self.target_file_gt)
+        elif self.target_file:
+            list_file = getNameCsvFile(path=self.target_file)
+        else:
+            list_file = os.listdir(self.table_path)
         # open output_dataset cea file to write inside 
-        with open(self.raw_output_dataset, "w+") as csv_file:
+        with open(self.output_dataset, "w+") as csv_file:
             writer = csv.writer(csv_file, delimiter=",")
-            # writer.writerow(header_cea)
-            # get filename from each file in dataset
             for filed in list_file:
-                filed += ".csv"
                 if filed.endswith(".csv"):
                     filename = filed.split(".")[0]
                     if not header:
@@ -117,12 +153,12 @@ class CEATask:
                 else:
                     print("it is not csv file")
                     csv_file.close()
-        return self.raw_output_dataset, self.target_file
+        return self.output_dataset
 
     
     def _makeDataset(
         self,
-        header=False,
+        header=True,
         col_before_row=True,
         comma_in_cell=False,
         transpose=False,
@@ -130,11 +166,19 @@ class CEATask:
         is_train=True,
         split=0
     ):
-        """ 
-            This function take two csv file which are almost same and compare the rows of the two files
-            in order to create a new file that is same of the csv file 1
+        """_summary_
+
+        Args:
+            header (bool, optional): _description_. Defaults to True. Change it to False if your tables don't have header
+            col_before_row (bool, optional): _description_. Defaults to True. If this args is set to true, 
+                it allow to determine if the output will be (tab_id, col_id, row_id) rather than (tab_id, row_id, col_id)
+            comma_in_cell (bool, optional): _description_. Defaults to False. Specify if the tables dataset has at least 2 entities in the table split by the comma(,)
+            transpose (bool, optional): _description_. Defaults to False. If this argument is set to True, table2Vect will transform table in vector row by row rather than col by col else.
+            is_vertical (bool, optional): _description_. Defaults to False. Set it to True if the type of tables is horizontal.
+            is_train (bool, optional): _description_. Defaults to False. Set it to True if it is a train or validation dataset.
+            split (int, optional): _description_. Defaults to 0. detemine at which position you want ta start compare the dataset with target file
         """
-        _raw_dataset, _target = self.buildDataset(
+        _raw_dataset = self.buildDataset(
             header=header,
             col_before_row=col_before_row,
             comma_in_cell=comma_in_cell,
@@ -143,38 +187,42 @@ class CEATask:
         )
         # _raw_dataset, _target = self.raw_output_dataset, self.target_file
         csv.field_size_limit(20000000)
-        with open(_target, 'r') as file1, open(_raw_dataset, 'r') as file2:
-            with open(self.output_dataset, 'w', newline='') as updated_file:
-                writer = csv.writer(updated_file)
-                _reader1 = csv.reader(file1)
-                _reader2 = csv.reader(file2)
-                
-                csv1_data = [row for row in _reader1]
-                csv2_data = [row for row in _reader2]     
-                
-                updated_data = []
+        if self.target_file_gt:
+            with open(self.target_file_gt, 'r') as file1, open(_raw_dataset, 'r') as file2:
+                with open(self.output_dataset, 'w', newline='') as updated_file:
+                    writer = csv.writer(updated_file)
+                    _reader1 = csv.reader(file1)
+                    _reader2 = csv.reader(file2)
+                    
+                    csv1_data = [row for row in _reader1]
+                    csv2_data = [row for row in _reader2]     
+                    
+                    updated_data = []
 
-                if col_before_row == True:
-                    updated_data.extend(["tab_id", "col_id", "row_id","label", 'context', 'entity'])
-                else:
-                    updated_data.extend(["tab_id", "row_id", "col_id","label", 'context', 'entity'])
-                writer.writerows([updated_data])
-                for row1 in csv1_data[split:]:
-                    match_found = False
-                    for row2 in csv2_data:
-                        if row1[:3] == row2[:3]:
-                            match_found = True
-                            if is_train:
-                                row2.append(row1[3])
-                            else:
-                                row2.append("NIL")
-                            updated_data.append(row2)
-                            writer.writerow(row2)
-                            break         
-                    if match_found == False:
-                        print(f"Row {row1} it is not in CSV2")
+                    if col_before_row == True:
+                        updated_data.extend(["tab_id", "col_id", "row_id","label", 'context', 'entity'])
+                    else:
+                        updated_data.extend(["tab_id", "row_id", "col_id","label", 'context', 'entity'])
+                    writer.writerows([updated_data])
+                    for row1 in csv1_data[split:]:
+                        match_found = False
+                        for row2 in csv2_data:
+                            if row1[:3] == row2[:3]:
+                                match_found = True
+                                if is_train:
+                                    row2.append(row1[3])
+                                else:
+                                    row2.append("NIL")
+                                updated_data.append(row2)
+                                writer.writerow(row2)
+                                break         
+                        if match_found == False:
+                            print(f"Row {row1} it is not in CSV2")
+        else:
+            df = pd.read_csv(self.output_dataset)
+            return df
             
-            print(f"Comparison completed. Updated CSV2 saved {self.output_dataset}")
+        print(f"Comparison completed. Updated CSV2 saved {self.output_dataset}")
 
     def _csv_to_jsonl(self, csv_path, json_path, is_entity=False):
         """ 
@@ -190,8 +238,9 @@ class CEATask:
                 label_list = df['label'][i].split(",")
                 j = 0
                 for uri in uri_list:
+                    label_list = correct_string(str(label_list[j]))
                     if is_entity:
-                        datas.append (
+                        datas.append(
                             {
                                 "messages":  [
                                     {
@@ -415,89 +464,224 @@ class CEATask:
         return corrected_text
     
     
-    def _annotate(self, model, path=None, comma_in_cell=False, col_before_row=True, split=0, is_symbolic=False, is_context=False, is_llm=True):
+    def _annotate(
+        self,
+        model,
+        path=None,
+        split=0,
+        is_symbolic=False,
+        is_connectionist=True,
+        is_context=False
+        ):
+        """_summary_
+
+        Args:
+            model (_type_): _description_
+            path (_type_, optional): _description_. Defaults to None.
+            comma_in_cell (bool, optional): _description_. Defaults to False.
+            col_before_row (bool, optional): _description_. Defaults to True.
+            split (int, optional): _description_. Defaults to 0.
+            is_symbolic (bool, optional): _description_. Defaults to False.
+            is_context (bool, optional): _description_. Defaults to False.
+            is_connectionist (bool, optional): _description_. Defaults to True.
+        """
         if not path:
-            filed = self.output_dataset
+            dataset_path = self.output_dataset
         else:
-            filed = path
+            dataset_path = path
         
-        if col_before_row:
-            header_cea = ["tab_id", "col_id", "row_id", "entity"]
+        # if col_before_row:
+        #     header_cea = ["tab_id", "col_id", "row_id", "entity"]
+        # else:
+        #     header_cea = ["tab_id", "row_id", "col_id", "entity"]
+            
+        if self.target_file_gt:
+            with open(self.target_file_gt, "r") as csv_file:
+                target_reader = csv.reader(csv_file)
+                target_data = [row for row in target_reader]
+                with open(self.file_annotated, 'w', newline='') as updated_file:
+                    writer = csv.writer(updated_file)
+                    # writer.writerow(header_cea)
+                    # check if it is csv file
+                    if dataset_path.endswith(".csv"):
+                        print(dataset_path)
+                        df = pd.read_csv(dataset_path, dtype=str) # open file with pandas
+                        i = split
+                        for data in target_data[split:]:
+                            updated_cea_data = []   # at each iteration in reader_data, empty the list
+                            label =  df['label'][i]     
+            
+                            if type(label) == type(np.nan):
+                                result = "NIL"
+                            else:
+                                # get annotation of the cell
+                                uri = []
+                                result = "NIL"
+                                if is_connectionist and is_symbolic:
+                                    user_input = f"Please what is wikidata URI of {label} entity"
+                                    uri = result = self.inference(model_id=model, user_input=user_input)
+                                    if uri:
+                                        result = uri
+                                    else:
+                                        uri = openUrl(str(label).strip(".").strip())
+                                        if uri:
+                                            result = uri
+                                        else:                                         
+                                            label = self.correct_spelling(label)
+                                            uri = openUrl(label)
+                                            if uri:
+                                                result = uri
+                                            else:
+                                                result = "NIL"
+                                else:
+                                    # use symbolic approach
+                                    if is_symbolic:
+                                        new_context = []
+                                        if df['context'][i].lower() != 'nil':
+                                            context = eval(df['context'][i])
+                                            print(label)
+                                            if isinstance(context, list):
+                                                for item in context:
+                                                    if isinstance(item, int) or isinstance(item, float):
+                                                        if "-" in str(item):
+                                                            new_context.append(str(item))
+                                                        else:
+                                                            item = f"+{item}"
+                                                            item = item.split(".")
+                                                            if len(item) == 2:
+                                                                if item[1] == "0":
+                                                                    item = item[0]
+                                                                else:
+                                                                    item = ".".join(item)
+                                                            else:
+                                                                item = "".join(item)
+                                                            new_context.append(item)
+                                                    else:
+                                                        new_context.append(item)
+                                            else:
+                                                new_context = [context]
+                                        else:
+                                            context = ''
+                                            is_context = False
+                                        print(context)
+                                        context = new_context
+                                        context_have_string_value = False
+                                        for lab in context[1:]:
+                                                if isinstance(lab, str):
+                                                    if lab[0:4].isdigit() or "".join(lab[1:].split('.')).isdigit():
+                                                        continue
+                                                    context_have_string_value = True
+                                                    break                   
+                                        print(context)
+                                        old_label = label
+                                        if is_context:
+                                            entity_ids = openUrl(label, context[1:])
+                                            if not entity_ids:
+                                                label = self.correct_spelling(label)
+                                                entity_ids = openUrl(label)
+                                                if not entity_ids:
+                                                    result = ''
+                                                elif len(entity_ids) == 1:
+                                                    result = entity_ids[0]
+                                                else:
+                                                    if label not in context and label != old_label and old_label not in context:
+                                                        context = [label]
+                                                    elif label not in context and label != old_label:
+                                                        index = context.index(old_label)
+                                                        context[index] = label
+                                                    if context.index(label) != 0:
+                                                        entity_ids = openUrl(context[0], context[1:])
+                                                        result = check_entity_properties_cea(entity_ids, context[1:], False, label, context_have_string_value)
+                                                    else:
+                                                        result = check_entity_properties_cea(entity_ids, context[1:], context_have_string_value=context_have_string_value)
+                                            else:
+                                                if len(entity_ids) == 1:
+                                                    result = entity_ids[0]
+                                                else:
+                                                    if label not in context:
+                                                        first_elt = context[0]
+                                                        context.pop()
+                                                        context.extend([label, first_elt])
+                                                    if context.index(label) != 0:
+                                                        entity_ids = openUrl(context[0], context[1:])
+                                                        result = check_entity_properties_cea(entity_ids, context[1:], False, label, context_have_string_value)
+                                                    else:
+                                                        result = check_entity_properties_cea(entity_ids, context[1:], context_have_string_value=context_have_string_value)
+                                            print(f"Label = {label}, context={context}, -> target_uri = http://www.wikidata.org/entity/{result}")
+                                        else:
+                                            result = openUrl(label)
+                                    
+                                    else:  
+                                        # Use connectionist approach               
+                                        user_input = f"Please what is wikidata URI of {label} entity.\nContext: {df['context'][i]}"            
+                                        if len(user_input) > 200:
+                                            user_input = f"Please what is wikidata URI of {label}"
+                                            # check uri
+                                        result = self.inference(model_id=model, user_input=user_input)
+                                        if result == "http:":
+                                            print("result nil. try again")
+                                            user_input = f"Please what is wikidata URI of {label} entity" 
+                                            result = self.inference(model_id=model, user_input=user_input)
+   
+                            data.append(result)
+                            updated_cea_data.append(data)
+                            i += 1                             
+                            #  write data in update cea file
+                            writer.writerow(updated_cea_data)
+                            print("*************************")
+                            print(f"Cell {i} annotated")
+                            print("*************************")
+                        
+                        else:
+                            print("it is not csv file")
         else:
-            header_cea = ["tab_id", "row_id", "col_id", "entity"]
-        with open(self.target_file_to_annotate, "r") as csv_file:
-            target_reader = csv.reader(csv_file)
-            target_data = [row for row in target_reader]
             with open(self.file_annotated, 'w', newline='') as updated_file:
                 writer = csv.writer(updated_file)
                 # writer.writerow(header_cea)
                 # check if it is csv file
-                if filed.endswith(".csv"):
-                    print(filed)
-                    _file = pd.read_csv(filed, dtype=str) # open file with pandas
-                    i = split
-                    for data in target_data[split:]:
+                if dataset_path.endswith(".csv"):
+                    print(dataset_path)
+                    df = pd.read_csv(dataset_path) # open file with pandas
+                    datas = df.values.tolist()
+                    print(len(df))
+                    for data in datas[split:]:
                         updated_cea_data = []   # at each iteration in reader_data, empty the list
-                        label =  _file['label'][i]     
-        
-                        if type(label) == type(np.nan):
-                            data.append("NIL")
-                            updated_cea_data.append(data)
-                            i += 1
+                        label =  df['label'][i]       
+                        if not label:
+                            result = "NIL"
                         else:
                             # get annotation of the cell
                             uri = []
-                            if not comma_in_cell and is_llm:
-                                uri = openUrl(str(label).strip(".").strip())
+                            result = "NIL"
+                            if is_connectionist and is_symbolic:
+                                user_input = f"Please what is wikidata URI of {label} entity.\nContext: {df['context'][i]}"            
+                                if len(user_input) > 200:
+                                    user_input = f"Please what is wikidata URI of {label}"
+                                # check uri
+                                uri = self.inference(model_id=model, user_input=user_input)
+                                if result == "http:":
+                                    print("result nil. try again")
+                                    user_input = f"Please what is wikidata URI of {label} entity" 
+                                    uri = self.inference(model_id=model, user_input=user_input)
                                 if uri:
                                     result = uri
                                 else:
-                                    if not self.is_number(label) or self.is_date(label):
+                                    uri = openUrl(str(label).strip(".").strip())
+                                    if uri:
+                                        result = uri
+                                    else:                                         
                                         label = self.correct_spelling(label)
                                         uri = openUrl(label)
                                         if uri:
                                             result = uri
                                         else:
-                                            user_input = f"Please what is wikidata URI of {label} entity"
-                                            result = result = self.inference(model_id=model, user_input=user_input)
-                                    else:
-                                        result = "NIL"
-                                            
-                            elif comma_in_cell:
-                                uri = []
-                                label_list = label.split(',')
-                                # if len(label_list) > 4:
-                                #     label_list = random.sample(label_list, k=4)
-                                
-                                for elt in label_list:
-                                    elt = elt.strip()
-                                    if is_symbolic:
-                                        partial_result = openUrl(elt)
-                                        if not partial_result:
-                                            elt = self.correct_spelling(elt)
-                                            partial_result = openUrl(elt)
-                                            uri.append(partial_result)
-                                        else:
-                                            uri.append(partial_result)                                                              
-                                    else:
-                                        user_input = f"Please what is wikidata URI of {elt} entity.\nContext: {_file['context'][i]}"                  
-                                        if len(user_input) > 200:
-                                            user_input = f"Please what is wikidata URI of {elt}"
-                                        # check uri
-                                        result = self.inference(model_id=model, user_input=user_input)
-                                        uri.append(result)
-                                # result = self.choose_random_valid_element(uri)
-                                result = ','.join(uri)
-                                print(f"The result of these entities are: {result}")
-                                # print(f"The best element of this cell is {result}")
+                                            result = "NIL"
                             else:
-                                # label = label.split(',')[0] 
-                                
+                                # use symbolic approach
                                 if is_symbolic:
                                     new_context = []
-
-                                    if _file['context'][i].lower() != 'nil':
-                                        context = eval(_file['context'][i])
+                                    if df['context'][i].lower() != 'nil':
+                                        context = eval(df['context'][i])
                                         print(label)
                                         if isinstance(context, list):
                                             for item in context:
@@ -526,11 +710,11 @@ class CEATask:
                                     context = new_context
                                     context_have_string_value = False
                                     for lab in context[1:]:
-                                            if isinstance(lab, str):
-                                                if lab[0:4].isdigit() or "".join(lab[1:].split('.')).isdigit():
-                                                    continue
-                                                context_have_string_value = True
-                                                break                   
+                                        if isinstance(lab, str):
+                                            if lab[0:4].isdigit() or "".join(lab[1:].split('.')).isdigit():
+                                                continue
+                                            context_have_string_value = True
+                                            break                   
                                     print(context)
                                     old_label = label
                                     if is_context:
@@ -568,19 +752,10 @@ class CEATask:
                                                     result = check_entity_properties_cea(entity_ids, context[1:], context_have_string_value=context_have_string_value)
                                         print(f"Label = {label}, context={context}, -> target_uri = http://www.wikidata.org/entity/{result}")
                                     else:
-                                        result = openUrl(label)                                  
-                                    if not result:
-                                        user_input = f"Please what is wikidata URI of {label} entity.\nContext: {_file['context'][i]}"                
-                                        if len(user_input) > 300:
-                                            user_input = f"Please what is wikidata URI of {label}"
-                                            # check uri
-                                        result = self.inference(model_id=model, user_input=user_input)
-                                        if result == "http:":
-                                            print("result nil. try again")
-                                            user_input = f"Please what is wikidata URI of {label} entity" 
-                                            result = self.inference(model_id=model, user_input=user_input)
-                                else:                 
-                                    user_input = f"Please what is wikidata URI of {label} entity.\nContext: {_file['context'][i]}"            
+                                        result = openUrl(label)                       
+                                else:  
+                                    # Use connectionist approach               
+                                    user_input = f"Please what is wikidata URI of {label} entity.\nContext: {df['context'][i]}"            
                                     if len(user_input) > 200:
                                         user_input = f"Please what is wikidata URI of {label}"
                                         # check uri
@@ -589,21 +764,16 @@ class CEATask:
                                         print("result nil. try again")
                                         user_input = f"Please what is wikidata URI of {label} entity" 
                                         result = self.inference(model_id=model, user_input=user_input)
-                                    # uri.append(result)    
-                                    
-                                    # if not result:
-                                    #     self._annotate(model, comma_in_cell, col_before_row, split, is_symbolic=True, is_context=is_context)
                             
-                            # add result of annation   
-                            data.append(result)
-                            updated_cea_data.append(data)
-                            i += 1  
-                            
+                        data.append(result)
+                        updated_cea_data.extend([data[0], data[1], data[2], data[-1]])
+                        i += 1  
+                                
                         #  write data in update cea file
                         writer.writerows(updated_cea_data)
                         print("*************************")
                         print(f"Cell {i} annotated")
                         print("*************************")
-                    
-                    else:
-                        print("it is not csv file")
+                        
+                else:
+                    print("it is not csv file")

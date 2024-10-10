@@ -1,10 +1,8 @@
-import math
 import random
 import pandas as pd
 import os, json, csv
 from .helper import getNameCsvFile
 import re, openai
-from .symbolic.api import openUrl, get_instance_of
 from collections import Counter
 from .utils import *
 
@@ -28,12 +26,12 @@ class TDTask:
     
     def  __init__(
         self, 
-        output_dataset, 
-        raw_output_dataset, 
-        target_file, table_path, 
-        file_annotated,
-        target_file_to_annotate,
-        context_length=4096
+        dataset_name = "cpa",
+        output_dataset = None,
+        target_file = None, 
+        table_path = None, 
+        file_annotated = None,
+        target_file_gt = None
     ):
         """_summary_
 
@@ -46,12 +44,53 @@ class TDTask:
             file_annotated (file): the path of annotatedfile
         """
         self.output_dataset = output_dataset
-        self.raw_output_dataset = raw_output_dataset
         self.target_file = target_file
         self.table_path = table_path
         self.file_annotated = file_annotated
-        self.context_length = context_length
-        self.target_file_to_annotate = target_file_to_annotate
+        self.context_length = 4096
+        self.target_file_gt = target_file_gt
+        self.dataset_name = dataset_name
+    
+    def get_dataset_name(self):
+        return self.dataset_name
+        
+    def get_dataset_path(self):
+        return self.output_dataset
+    
+    def get_annotated_file(self):
+        return self.file_annotated
+    
+    def set_annotated_file_path(self, path):
+        self.file_annotated = path
+        return self.file_annotated
+    
+    def set_dataset_path(self, dataset_path):
+        self.output_dataset = dataset_path
+        return self.output_dataset
+    
+    def set_target_file_path(self, path):
+        """_summary_
+
+        Args:
+            path (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        self.target_file = path
+        return self.target_file
+    
+    def set_table_path(self, path):
+        """_summary_
+
+        Args:
+            path (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        self.table_path = path
+        return self.table_path
     
     def openCSV(self, path):
         """ 
@@ -103,14 +142,18 @@ class TDTask:
             file: return target and raw dataset
         """
         # get name csv file inside of target_output_dataset without duplication
-        list_file = getNameCsvFile(path=self.target_file)
+        if self.target_file_gt:
+            list_file = getNameCsvFile(path=self.target_file_gt)
+        elif self.target_file:
+            list_file = getNameCsvFile(path=self.target_file)
+        else:
+            list_file = os.listdir(self.table_path)
         # open output_dataset cea file to write inside 
-        with open(self.raw_output_dataset, "w+") as csv_file:
+        with open(self.output_dataset, "w+") as csv_file:
             writer = csv.writer(csv_file, delimiter=",")
             # writer.writerow(header_cea)
             # get filename from each file in dataset
             for filed in list_file:
-                filed += ".csv"
                 if filed.endswith(".csv"):
                     filename = filed.split(".")[0]
                     print(filename)
@@ -194,7 +237,7 @@ class TDTask:
                 else:
                     print("it is not csv file")
             csv_file.close()
-        return self.raw_output_dataset, self.target_file
+        return self.output_dataset
     
     def _makeDataset(
         self,
@@ -209,39 +252,39 @@ class TDTask:
             is_entity (bool, optional): _description_. Defaults to False.
             n (int, optional): _description_. Defaults to 5.
         """
-        _raw_dataset, _target = self.buildDataset(n=n, is_entity=is_entity)
-        with open(_target, 'r') as file1, open(_raw_dataset, 'r') as file2:
-            _reader1 = csv.reader(file1)
-            _reader2 = csv.reader(file2)
-            
-            csv1_data = [row for row in _reader1]
-            csv2_data = [row for row in _reader2]     
-            
-            updated_data = []
-            if is_train:
-                updated_data.append(["tab_id", "columns", "entity"])
-            else:
-                updated_data.append(["tab_id", "columns", "entity"])          
-            for row1 in csv1_data:
-                match_found = False
-                for row2 in csv2_data:
-                    if row1[:1] == row2[:1]:
-                        match_found = True
-                        if is_train:
-                            row2.append(row1[1])
-                        else:
-                            row2.append("NIL")
-                        updated_data.append(row2)
-                        # print(f"Row {row1} it is in CSV2")
-                        break         
-                if match_found == False:
-                    # print(f"Row {row1} it is not in CSV2")
-                    pass
-            
-            with open(self.output_dataset, 'w', newline='') as updated_file:
-                writer = csv.writer(updated_file)
-                writer.writerows(updated_data)       
-            print("Comparison completed. Updated CSV2 saved as 'updated_csv2.csv'.")
+        _raw_dataset = self.buildDataset(n=n, is_entity=is_entity)
+        if self.target_file_gt:
+            with open(self.target_file_gt, 'r') as file1, open(_raw_dataset, 'r') as file2:
+                _reader1 = csv.reader(file1)
+                _reader2 = csv.reader(file2)
+                
+                csv1_data = [row for row in _reader1]
+                csv2_data = [row for row in _reader2]     
+                
+                with open(self.output_dataset, 'w', newline='') as updated_file:
+                    writer.writerow(updated_data)(["tab_id", "columns", "entity"])
+                    for row1 in csv1_data:
+                        updated_data = []      
+                        match_found = False
+                        for row2 in csv2_data:
+                            if row1[:1] == row2[:1]:
+                                match_found = True
+                                if is_train:
+                                    row2.append(row1[1])
+                                else:
+                                    row2.append("NIL")
+                                updated_data.append(row2)
+                                writer = csv.writer(updated_file)
+                                writer.writerow(updated_data)
+                                # print(f"Row {row1} it is in CSV2")
+                                break         
+                        if match_found == False:
+                            # print(f"Row {row1} it is not in CSV2")
+                            pass
+                    
+        else:
+            df = pd.read_csv(self.output_dataset)
+        print("Comparison completed. Updated CSV2 saved as 'updated_csv2.csv'.")
 
     def _csv_to_jsonl(self, csv_path, json_path):
         """ 

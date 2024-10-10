@@ -262,8 +262,9 @@ if __name__ == "__main__":
             print("\n")
         elif choice == "5":
             gpttuner.fineTuningJobID(
-                training_path="json dataset/CPA_Conversational2024_train.jsonl", 
-                validation_file_path="json dataset/CPA_Conversational2024_val.jsonl"
+                # training_path="json dataset/CPA_Conversational2024_train.jsonl", 
+                # validation_file_path="json dataset/CPA_Conversational2024_val.jsonl"
+                # training_file_id=
             )
             # gpttuner.fineTuningJobID(
             #     training_path="train_llm1.jsonl",

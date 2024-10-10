@@ -1,12 +1,15 @@
 from flask import Flask, request, jsonify
 from task.ra import RATask
 from task.cpa import CPATask
+from task.cea import CEATask
+from task.cta import CTATask
+from task.td import TDTask
 from evaluation.cta_evaluator import CTA_Evaluator
 from evaluation.ra_evaluator import RA_Evaluator
 from evaluation.td_evaluator import TD_Evaluator
 from evaluation.cpa_evaluator import CPA_Evaluator
 import os
-from path_data.utils import ra_model_finetuned, cpa_model_finetuned
+from path_data.utils import ra_model_finetuned, cpa_model_finetuned, cea_model_finetuned_4, td_model_finetuned_2, td_model_finetuned_1
 
 app = Flask(__name__)
 
@@ -80,8 +83,46 @@ def make_dataset():
             return jsonify({
                 "message": "Error during the process:",
             }), 400
-    elif task.lower() == "cea":
-        return jsonify({"message": task}), 200
+    elif task.lower() == "cea":       
+        is_vertical = request.json.get('is_vertical', False)
+        transpose = request.json.get('transpose', False)
+        col_before_row = request.json.get('col_before_row', False)
+        coma_in_cell = request.json.get('coma_in_cell', False)
+        split = request.json.get('split', False)
+        cea_task = CEATask(
+            dataset_name=dataset_name,
+            table_path=table_path,
+            target_file=target_path, 
+            target_file_gt=target_gt_path
+        )
+        if not os.path.exists(path):
+            path = os.makedirs(path)
+        if is_train:
+            cea_task.set_dataset_path(f"{path}/dataset_{cea_task.get_dataset_name()}_{task}_train.csv")
+        else:
+            cea_task.set_dataset_path(f"{path}/dataset_{cea_task.get_dataset_name()}_{task}_test.csv")
+        cea_task._makeDataset(
+            header=header, 
+            is_vertical=is_vertical, 
+            transpose=transpose, 
+            col_before_row=col_before_row,
+            comma_in_cell=coma_in_cell,
+            is_train=is_train,
+            split=split
+        )
+        try:
+            return jsonify({
+                "dataset_path": cea_task.get_dataset_path(),
+                "table_path": cea_task.target_file_gt,
+                "task": "Column Property Annotation",
+                "status": "succes",
+                "code": 200
+            })
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "Error during the process:",
+            }), 400
     elif task.lower() == "cta":
         return jsonify({"message": task}), 200
     elif task.lower() == "td":
@@ -151,11 +192,105 @@ def annotate():
                 "message": "Error during the process:",
             }), 400
     elif task.lower() == "cea":
-        return jsonify({"message": task}), 200
+        is_symbolic = request.json.get('is_symbolic', False)
+        is_connectionist = request.json.get('is_connectionist', True)
+        is_context = request.json.get('is_context', False)
+        cea_task = CEATask(
+            dataset_name=dataset_name,
+            output_dataset=dataset_path
+        )
+        if not os.path.exists(path):
+            path = os.makedirs(path)
+        if is_train:
+            cea_task.set_annotated_file_path(f"{path}/annotate_{cea_task.get_dataset_name()}_{task}_train_{split}.csv")
+        else:
+            cea_task.set_annotated_file_path(f"{path}/annotate_{cea_task.get_dataset_name()}_{task}_test_{split}.csv")
+        cea_task._annotate(
+            model=cea_model_finetuned_4,
+            path=dataset_path,
+            split=split,
+            is_symbolic=is_symbolic,
+            is_connectionist=is_connectionist,
+            is_context=is_context
+        )
+        try:
+            return jsonify({
+                "dataset_path": cea_task.get_dataset_path(),
+                "task": "Cell Entity Annotation",
+                "status": "succes",
+                "code": 200
+            })
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "Error during the process:",
+            }), 400
     elif task.lower() == "cta":
-        return jsonify({"message": task}), 200
+        is_combine_approach = request.json.get('is_combine_approach', False)
+        cta_task = CTATask(
+            dataset_name=dataset_name,
+            output_dataset=dataset_path
+        )
+        if not os.path.exists(path):
+            path = os.makedirs(path)
+        if is_train:
+            cta_task.set_annotated_file_path(f"{path}/annotate_{cta_task.get_dataset_name()}_{task}_train_{split}.csv")
+        else:
+            cta_task.set_annotated_file_path(f"{path}/annotate_{cta_task.get_dataset_name()}_{task}_test_{split}.csv")
+        cta_task._annotate(
+            model=cpa_model_finetuned,
+            path=dataset_path,
+            split=split,
+            is_combine_approach=is_combine_approach
+        )
+        try:
+            return jsonify({
+                "dataset_path": cta_task.get_dataset_path(),
+                "task": "Cell Entity Annotation",
+                "status": "succes",
+                "code": 200
+            })
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "Error during the process:",
+            }), 400
     elif task.lower() == "td":
-        return jsonify({"message": task}), 200
+        td_task = TDTask(
+            dataset_name=dataset_name,
+            output_dataset=dataset_path
+        )
+        if not os.path.exists(path):
+            path = os.makedirs(path)
+        if is_train:
+            td_task.set_annotated_file_path(f"{path}/annotate_{td_task.get_dataset_name()}_{task}_train_{split}.csv")
+        else:
+            td_task.set_annotated_file_path(f"{path}/annotate_{td_task.get_dataset_name()}_{task}_test_{split}.csv")
+        
+        if is_entity:
+            td_task._annotate(
+                model=cpa_model_finetuned,
+                path=dataset_path,
+                split=split
+            )
+        else:
+            td_task._annotate(
+                model=cpa_model_finetuned,
+                path=dataset_path,
+                split=split
+            )
+        try:
+            return jsonify({
+                "dataset_path": td_task.get_dataset_path(),
+                "task": "Cell Entity Annotation",
+                "status": "succes",
+                "code": 200
+            })
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "Error during the process:",
+            }), 400
     else:
         return jsonify({"message": "task does not exist"}), 400
     

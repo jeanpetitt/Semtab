@@ -1,4 +1,3 @@
-import math
 import random
 import pandas as pd
 import os, json, csv
@@ -28,12 +27,12 @@ class CTATask:
     
     def  __init__(
         self, 
-        output_dataset, 
-        raw_output_dataset, 
-        target_file, table_path, 
-        file_annotated,
-        target_file_to_annotate,
-        context_length=4096
+        dataset_name = "cta",
+        output_dataset = None,
+        target_file = None, 
+        table_path = None, 
+        file_annotated = None,
+        target_file_gt = None
     ):
         """_summary_
 
@@ -46,12 +45,52 @@ class CTATask:
             file_annotated (file): the path of annotatedfile
         """
         self.output_dataset = output_dataset
-        self.raw_output_dataset = raw_output_dataset
         self.target_file = target_file
         self.table_path = table_path
         self.file_annotated = file_annotated
-        self.context_length = context_length
-        self.target_file_to_annotate = target_file_to_annotate
+        self.context_length = 4096
+        self.target_file_gt = target_file_gt
+        self.dataset_name = dataset_name
+    def get_dataset_name(self):
+        return self.dataset_name
+        
+    def get_dataset_path(self):
+        return self.output_dataset
+    
+    def get_annotated_file(self):
+        return self.file_annotated
+    
+    def set_annotated_file_path(self, path):
+        self.file_annotated = path
+        return self.file_annotated
+    
+    def set_dataset_path(self, dataset_path):
+        self.output_dataset = dataset_path
+        return self.output_dataset
+    
+    def set_target_file_path(self, path):
+        """_summary_
+
+        Args:
+            path (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        self.target_file = path
+        return self.target_file
+    
+    def set_table_path(self, path):
+        """_summary_
+
+        Args:
+            path (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        self.table_path = path
+        return self.table_path
     
     def openCSV(self, path):
         """ 
@@ -69,24 +108,24 @@ class CTATask:
         """_summary_
 
         Args:
-            header (bool, optional): true if table have header and False else. Defaults to True.
-            col_before_row (bool, optional): true if the structure of target is 
-            [tab_id col_id row_id]. Defaults to True.
-            comma_in_cell (bool, optional): True if the data in a cell are consider as
-            multi entities. Defaults to False.
+            header (bool, optional):Defaults to True Set it to false if tables dataset don't have header.
 
         Returns:
-            file: return target and raw dataset
+            file: return a raw dataset
         """
         # get name csv file inside of target_output_dataset without duplication
-        list_file = getNameCsvFile(path=self.target_file)
+        if self.target_file_gt:
+            list_file = getNameCsvFile(path=self.target_file_gt)
+        elif self.target_file:
+            list_file = getNameCsvFile(path=self.target_file)
+        else:
+            list_file = os.listdir(self.table_path)
         # open output_dataset cea file to write inside 
-        with open(self.raw_output_dataset, "w+") as csv_file:
+        with open(self.output_dataset, "w+") as csv_file:
             writer = csv.writer(csv_file, delimiter=",")
             # writer.writerow(header_cea)
             # get filename from each file in dataset
             for filed in list_file:
-                filed += ".csv"
                 if filed.endswith(".csv"):
                     filename = filed.split(".")[0]
                     if not header:
@@ -126,7 +165,7 @@ class CTATask:
                 else:
                     print("it is not csv file")
             csv_file.close()
-        return self.raw_output_dataset, self.target_file
+        return self.output_dataset
     def _makeDataset(
         self,
         header=True,
@@ -136,41 +175,42 @@ class CTATask:
             This function take two csv file which are almost same and compare the rows of the two files
             in order to create a new file that is same of the csv file 1
         """
-        _raw_dataset, _target = self.buildDataset(
+        _raw_dataset, = self.buildDataset(
             header=header
         )
         # _raw_dataset, _target = self.raw_output_dataset, self.target_file
-        with open(_target, 'r') as file1, open(_raw_dataset, 'r') as file2:
-            _reader1 = csv.reader(file1)
-            _reader2 = csv.reader(file2)
-            
-            csv1_data = [row for row in _reader1]
-            csv2_data = [row for row in _reader2]     
-            
-            updated_data = []
-            if is_train:
-                updated_data.append(["tab_id", "col_id", "entities", "entity_type"])
-            else:
-                updated_data.append(["tab_id", "col_id", "entities"])          
-            for row1 in csv1_data:
-                match_found = False
-                for row2 in csv2_data:
-                    if row1[:2] == row2[:2]:
-                        match_found = True
-                        if is_train:
-                            row2.append(row1[2])
-                        else: 
-                            row2.append("NIL")
-                        updated_data.append(row2)
-                        # print(f"Row {row1} it is in CSV2")
-                        break         
-                if match_found == False:
-                    print(f"Row {row1} it is not in CSV2")
-            
-            with open(self.output_dataset, 'w', newline='') as updated_file:
-                writer = csv.writer(updated_file)
-                writer.writerows(updated_data)       
-            print("Comparison completed. Updated CSV2 saved as 'updated_csv2.csv'.")
+        if self.target_file_gt:
+            with open(self.target_file_gt, 'r') as file1, open(_raw_dataset, 'r') as file2:
+                _reader1 = csv.reader(file1)
+                _reader2 = csv.reader(file2)
+                
+                csv1_data = [row for row in _reader1]
+                csv2_data = [row for row in _reader2]     
+                  
+                with open(self.output_dataset, 'w', newline='') as updated_file:
+                    writer.writerow(["tab_id", "col_id", "entities", "entity_type"]) 
+                    for row1 in csv1_data:
+                        match_found = False
+                        for row2 in csv2_data:
+                            updated_data = []
+                            if row1[:2] == row2[:2]:
+                                match_found = True
+                                if is_train:
+                                    row2.append(row1[2])
+                                else: 
+                                    row2.append("NIL")
+                                updated_data.append(row2)
+                                writer = csv.writer(updated_file)
+                                writer.writerow(updated_data)
+                                # print(f"Row {row1} it is in CSV2")
+                                break         
+                        if match_found == False:
+                            print(f"Row {row1} it is not in CSV2")
+        else:
+            df = pd.read_csv(self.output_dataset)
+            return df 
+        
+        print("Comparison completed. Updated CSV2 saved as 'updated_csv2.csv'.")
 
     def _csv_to_jsonl(self, csv_path, json_path):
         """ 
@@ -232,8 +272,7 @@ class CTATask:
             json_output_dataset (file): output_dataset json file obtained after combine file
             split (str): example train[:10%], test[:10%], val[:10%]
         
-        """
-        
+        """      
         files = os.listdir(json_path)
         datas = []
         data_size = 0
@@ -393,25 +432,8 @@ class CTATask:
             uri = ""
                
         return uri
-            
-    def is_number(self, string):
-        return re.match(r"^[+-]?\d+(\.\d+)?$", str(string)) is not None
     
-    def is_date(self, string):
-        split_slash = len(string.split("/"))
-        split_tiret = len(string.split("-"))
-        if split_slash == 3 or split_tiret == 3:
-            if self.is_number(split_tiret[0]) or self.is_number(split_tiret[0][1:]) or  self.is_number(split_slash[0]):
-                return False
-        return True
-    
-    def choose_random_valid_element(self,my_list):
-        valid_elements = [element for element in my_list if element not in (None, "", False)]
-        if not valid_elements:
-            return None
 
-        return random.choice(valid_elements)
-    
     def correct_spelling(self, text):
         prompt = f"Don't argument in your answer. Correct the spelling of this text : \"{text}\""
         model = "gpt-4o"
@@ -446,25 +468,109 @@ class CTATask:
             is_combine_approach (bool, optional): _description_. Defaults to False.
         """
         if not path:
-            filed = self.output_dataset
+            dataset_path = self.output_dataset
         else:
-            filed = path
-        header_cta = ["tab_id", "col_id", "annotation"]
+            dataset_path = path
         
-        with open(self.target_file_to_annotate, "r") as csv_file:
-            target_reader = csv.reader(csv_file)
-            target_data = [row for row in target_reader]
+        if self.target_file_gt:
+            with open(self.target_file_gt, "r") as csv_file:
+                target_reader = csv.reader(csv_file)
+                target_data = [row for row in target_reader]
+                with open(self.file_annotated, 'w', newline='') as updated_file:
+                    writer = csv.writer(updated_file)
+                    # writer.writerow(header_cta)
+                    # check if it is csv file
+                    if dataset_path.endswith(".csv"):
+                        print(dataset_path)
+                        df = pd.read_csv(f"{dataset_path}") # open file with pandas
+                        i = split
+                        for data in target_data[split:]:
+                            updated_cea_data = []   # at each iteration in reader_data, empty the list
+                            list_entity =  df['entities'][i]     
+                            # get annotation of the column type
+                            user_input = f"Please Give the  wikidata URI of the enity type of the following entities: {list_entity}"                  
+                            # Use symbolic approach combine with connectionist approach
+                            if is_combine_approach:
+                                list_entity = eval(list_entity)
+                                uri_type_list = []
+                                for label in list_entity[:random.randrange(1, 4)]:
+                                    entity_id = openUrl(label)
+                                    entity_id = entity_id.split('/')[-1] if entity_id else "nil"
+                                    if entity_id.lower() != 'nil' and entity_id:
+                                        uri_type = get_instance_of(entity_id)
+                                        uri_type_list.append(uri_type)
+                                    else:
+                                        label = self.correct_spelling(label)
+                                        entity_id = openUrl(label)
+                                        entity_id = entity_id.split('/')[-1] if entity_id else "nil"
+                                        if entity_id.lower() != 'nil' and entity_id:
+                                            uri_type = get_instance_of(entity_id)
+                                            uri_type_list.append(uri_type)
+                                        
+                                print(uri_type_list)
+                                if uri_type_list:
+                                    uri_type_list = [elem for elem in uri_type_list if elem is not None]
+                                    result = get_most_common_element(uri_type_list)
+                                    print("the wikidata uri of these entity is: ", result)
+                                else:
+                                    result = ''
+                                
+                                # use connectionist approach
+                                if not result: 
+                                    # get uri                     
+                                    result = self.inference(model_id=model, user_input=user_input)
+                            else:
+                                result = self.inference(model_id=model, user_input=user_input)
+                                if (result == '' or not result.split('Q')[-1].isdigit()) and result.lower() != "nil":
+                                    list_entity = eval(list_entity)
+                                    uri_type_list = []
+                                    for label in list_entity[:3]:
+                                        entity_id = openUrl(label)
+                                        if entity_id:
+                                            entity_id = entity_id.split('/')[-1]
+                                            uri_type = get_instance_of(entity_id)
+                                            uri_type_list.append(uri_type)
+                                        else:
+                                            label = self.correct_spelling(label)
+                                            entity_id = openUrl(label)
+                                            if entity_id:
+                                                uri_type = get_instance_of(entity_id)
+                                                uri_type_list.append(uri_type)
+                                            else:
+                                                uri_type_list.append(entity_id)
+                                    print(uri_type_list)
+                                    uri_type_list = [elem for elem in uri_type_list if elem is not None]
+                                    result = get_most_common_element(uri_type_list)
+                                    if not result:
+                                        result = "NIL"                     
+                                    print(result)
+                                    
+                            # add result of annation   
+                            data.append(result)
+                            updated_cea_data.append(data)
+                                
+                            #  write data in update cea file
+                            writer.writerows(updated_cea_data)
+                            print("*************************")
+                            print(f"Col {i} annotated")
+                            print("*************************")
+                            i += 1
+                        else:
+                            print("it is not csv file")
+        else:
             with open(self.file_annotated, 'w', newline='') as updated_file:
                 writer = csv.writer(updated_file)
                 # writer.writerow(header_cta)
                 # check if it is csv file
-                if filed.endswith(".csv"):
-                    print(filed)
-                    _file = pd.read_csv(f"{filed}") # open file with pandas
+                if dataset_path.endswith(".csv"):
+                    print(dataset_path)
+                    df = pd.read_csv(f"{dataset_path}") # open file with pandas
+                    datas = df.values.tolist()
+                    print(len(df))
                     i = split
-                    for data in target_data[split:]:
+                    for data in datas[split:]:
                         updated_cea_data = []   # at each iteration in reader_data, empty the list
-                        list_entity =  _file['entities'][i]     
+                        list_entity =  df['entities'][i]     
                         # get annotation of the column type
                         user_input = f"Please Give the  wikidata URI of the enity type of the following entities: {list_entity}"                  
                         # Use symbolic approach combine with connectionist approach
@@ -483,20 +589,18 @@ class CTATask:
                                     entity_id = entity_id.split('/')[-1] if entity_id else "nil"
                                     if entity_id.lower() != 'nil' and entity_id:
                                         uri_type = get_instance_of(entity_id)
-                                        uri_type_list.append(uri_type)
-                                    
+                                        uri_type_list.append(uri_type)                                        
                             print(uri_type_list)
                             if uri_type_list:
                                 uri_type_list = [elem for elem in uri_type_list if elem is not None]
                                 result = get_most_common_element(uri_type_list)
                                 print("the wikidata uri of these entity is: ", result)
                             else:
-                                result = ''
-                            
-                            # use connectionist approach
+                                result = ''                            
                             if not result: 
                                 # get uri                     
                                 result = self.inference(model_id=model, user_input=user_input)
+                        # use connectionist approach
                         else:
                             result = self.inference(model_id=model, user_input=user_input)
                             if (result == '' or not result.split('Q')[-1].isdigit()) and result.lower() != "nil":
@@ -521,8 +625,7 @@ class CTATask:
                                 result = get_most_common_element(uri_type_list)
                                 if not result:
                                     result = "NIL"                     
-                                print(result)
-                                
+                                print(result)                        
                         # add result of annation   
                         data.append(result)
                         updated_cea_data.append(data)
@@ -533,5 +636,5 @@ class CTATask:
                         print(f"Col {i} annotated")
                         print("*************************")
                         i += 1
-                    else:
-                        print("it is not csv file")
+                else:
+                    print("it is not csv file")

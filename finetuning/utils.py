@@ -62,7 +62,7 @@ class Gpt3FinetuningProcess:
         print(f"File uploaded successfully with ID: { fileID}")
         return fileID
     
-    def fineTuningJobID(self, training_file_id=None, training_path=None, validation_file_path=None):
+    def fineTuningJobID(self, training_file_id=None, training_path=None, validation_file_path=None, val_file_id=None):
         """_summary_
 
         Args:
@@ -83,7 +83,7 @@ class Gpt3FinetuningProcess:
             valID = create_fileID(validation_file_path)
             print("validation file was upload successfully")
         else:
-            valID = None
+            valID = val_file_id
         
         print("FIne tuning Started correctly......")
         response = openai.fine_tuning.jobs.create(

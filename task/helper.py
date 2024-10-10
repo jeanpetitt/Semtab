@@ -59,13 +59,11 @@ def getAllCellInTableColByBCol(table, is_vertical, comma_in_cell):
                             elts.append(random.choice(str(x).split(",")).strip())
                     cols_row_not_nan = elts
                 if is_valid_format(str(row[cols])):
-                    new_rows = row[cols]
+                    new_rows = [row[cols]]
                 else:
                     new_rows = [x for x in str(row[cols]).split(',') if not contains_html_tags(str(x)) and not 'http' in str(x)]
-                if is_vertical:
-                    new_rows = ",".join(new_rows)
-                else:
-                    new_rows = find_element_or_first(new_rows)
+                
+                new_rows = find_element_or_choice(new_rows)
                 
                 if is_vertical:
                     # check if row a row contain more than 15 elements

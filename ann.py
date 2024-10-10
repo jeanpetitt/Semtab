@@ -588,4 +588,4 @@ def process_file(input_file, output_file, split=0):
             i += 1
         # writer.writerows(data_reader)
 
-process_file('dataset/llm_test_cea_dataset.csv', 'output5.csv', split=58943)
+process_file('dataset/llm_test_cea_dataset.csv', 'output6.csv', split=74623)

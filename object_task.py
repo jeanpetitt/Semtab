@@ -10,11 +10,12 @@ gpttuner = Gpt3FinetuningProcess(
     name="annotator-cpa-02-24", 
     base_model=cpa_model_finetuned,
     # base_model=td_model_finetuned_1,
-    hyperparameter = {
-        'n_epochs': 10,
-        'batch_size': 2,
-        "learning_rate_multiplier": 8,
-    },
+    # hyperparameter = {
+    #     'n_epochs': 10,
+    #     'batch_size': 2,
+    #     "learning_rate_multiplier": 8,
+    # },
+    hyperparameter= {}
 )
 gpttuner.get_api_key()
 

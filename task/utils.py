@@ -1,5 +1,8 @@
 import re
 from urllib.parse import unquote
+import random
+
+random.seed(42)
 
 def is_number(string):
     word = "".join(str(string).split())[0:6]
@@ -16,11 +19,11 @@ def is_date(string):
             return True
     return False  
 
-def find_element_or_first(lst):
+def find_element_or_choice(lst):
     for element in lst:
-        if re.match(r'^Q\d+$', element):  # Regex to match 'Q' followed by one or more digits
+        if re.match(r'^q\d+$', element.lower()):  # Regex to match 'Q' followed by one or more digits
             return element
-    return lst[0] if lst else None
+    return random.choice(lst) if lst else None
 
 def contains_html_tags(text):
     # Define a regex pattern for HTML tags
@@ -78,7 +81,7 @@ def correct_string(expression: str) -> str:
         opening = stack.pop()
         if opening == '[':
             result.append(']')
-    
+    # print(result)
     corrected_string = ''.join(result)
 
     # Corriger les guillemets doubles à l'intérieur des crochets pour qu'ils deviennent des guillemets simples
@@ -123,4 +126,10 @@ def is_numerical(object: list):
             new_object.append(item)
     return new_object
 
+def choose_random_valid_element(object: list):
+    valid_elements = [element for element in object if element not in (None, "", False)]
+    if not valid_elements:
+        return None
+
+    return random.choice(valid_elements)
 # print(decole_url_file("http://commons.wikimedia.org/wiki/Special:FilePath/JAS%2039%20Gripen%20momument%20L%C3%A5ngholmen%202.jpg"))

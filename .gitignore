@@ -8,7 +8,7 @@ venv
 
 # File too long
 data*
-output*
+out*
 dataset/td
 dataset/cea
 dataset/cpa
@@ -16,3 +16,7 @@ dataset/ra
 dataset/cta
 result*
 json_dataset/
+gen*
+fin*
+part*
+test*

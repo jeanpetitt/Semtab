@@ -362,20 +362,27 @@ class CPATask:
         datas = []
         for i in range(len(df['col_label'])):
             # print(df['tab_id'][i])
-            value_property = ""
-            try:         
-                value_property = df['col_label'][i]
-                value_property = correct_string(str(value_property))
-                value_property = value_property.split("::")[0].strip('"').strip(" ")
+            prompt_input = ""
+            value_property = df['col_label'][i]
+            value_property = correct_string(str(value_property))
+            value_property = value_property.split("::")[0].strip('"').strip(" ")
+            context = df['list_col']
+            try:                       
+                if "identifier" in context:
+                    context = context['identifier']
+                    prompt_input = f"Which wikidata property has this value: {value_property}, {context} allow to identify this value."
+                else:
+                    context = eval(context)
+                    context = context[:5]
+                    prompt_input = f"Which wikidata property has this value: {value_property}, {context} allow to identify this value."
             except:
-                value_property = [df['col_label'][i]]
-                value_property = correct_string(value_property)
+                # print(context[:5])
+                # value_property = correct_string(context)
                 value_property = value_property.split("::")[0].strip('"').strip(" ")
             uri = df['entity'][i]
             
-            prompt_input = f"Please which wikidata property has this value: {value_property}"
-            if len(prompt_input) >= 2048:
-                print(len(prompt_input))
+            # if len(prompt_input) >= 2048:
+            #     print(len(prompt_input))
             datas.append(
                 {
                     "messages":  [
@@ -389,7 +396,7 @@ class CPATask:
                         },      
                         {
                             "role": "assistant", 
-                            "content": f"""{{"value_property":  "{value_property}", "uri": "{uri}"}}"""
+                            "content": f"""{{"value_property": "{value_property}", "uri": "{uri}", "context": "{context}"}}"""
                         }
                     ]
                 }
@@ -768,6 +775,7 @@ class CPATask:
                     print(dataset_path)
                     df = pd.read_csv(dataset_path) # open file with pandas
                     datas = df.values.tolist()
+                    print(len(df))
                     i = split
                     for data in datas[split:]:
                         # print(data)
