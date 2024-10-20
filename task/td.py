@@ -243,6 +243,7 @@ class TDTask:
         self,
         is_train=True,
         is_entity=False,
+        split=0,
         n=5
     ):
         """_summary_
@@ -262,9 +263,9 @@ class TDTask:
                 csv2_data = [row for row in _reader2]     
                 
                 with open(self.output_dataset, 'w', newline='') as updated_file:
-                    writer.writerow(updated_data)(["tab_id", "columns", "entity"])
-                    for row1 in csv1_data:
-                        updated_data = []      
+                    writer = csv.writer(updated_file)
+                    writer.writerow(["tab_id", "columns", "entity"])
+                    for row1 in csv1_data[split:]:
                         match_found = False
                         for row2 in csv2_data:
                             if row1[:1] == row2[:1]:
@@ -273,17 +274,15 @@ class TDTask:
                                     row2.append(row1[1])
                                 else:
                                     row2.append("NIL")
-                                updated_data.append(row2)
-                                writer = csv.writer(updated_file)
-                                writer.writerow(updated_data)
+                                writer.writerow(row2)
                                 # print(f"Row {row1} it is in CSV2")
                                 break         
                         if match_found == False:
-                            # print(f"Row {row1} it is not in CSV2")
-                            pass
+                            print(f"Row {row1} it is not in CSV2")
                     
         else:
             df = pd.read_csv(self.output_dataset)
+            return df
         print("Comparison completed. Updated CSV2 saved as 'updated_csv2.csv'.")
 
     def _csv_to_jsonl(self, csv_path, json_path):

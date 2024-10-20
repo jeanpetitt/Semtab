@@ -95,7 +95,7 @@ class CEATask:
         col_before_row,
         comma_in_cell,
         transpose,
-        is_vertical
+        is_entity
     ):
         # get name csv file inside of target_output_dataset without duplication
         if self.target_file_gt:
@@ -138,7 +138,7 @@ class CEATask:
                         # get all the cell in a table
                         list_cell = getAllCellInTableColByBCol(
                             table=_file, 
-                            is_vertical=is_vertical, 
+                            is_entity=is_entity, 
                             comma_in_cell=comma_in_cell
                         )
                         
@@ -162,8 +162,8 @@ class CEATask:
         col_before_row=True,
         comma_in_cell=False,
         transpose=False,
-        is_vertical=False,
         is_train=True,
+        is_entity=False,
         split=0
     ):
         """_summary_
@@ -183,19 +183,19 @@ class CEATask:
             col_before_row=col_before_row,
             comma_in_cell=comma_in_cell,
             transpose=transpose,
-            is_vertical=is_vertical
+            is_entity=is_entity
         )
         # _raw_dataset, _target = self.raw_output_dataset, self.target_file
         csv.field_size_limit(20000000)
         if self.target_file_gt:
             with open(self.target_file_gt, 'r') as file1, open(_raw_dataset, 'r') as file2:
+                _reader1 = csv.reader(file1)
+                _reader2 = csv.reader(file2)
+                csv1_data = [row for row in _reader1]
+                csv2_data = [row for row in _reader2]     
                 with open(self.output_dataset, 'w', newline='') as updated_file:
                     writer = csv.writer(updated_file)
-                    _reader1 = csv.reader(file1)
-                    _reader2 = csv.reader(file2)
                     
-                    csv1_data = [row for row in _reader1]
-                    csv2_data = [row for row in _reader2]     
                     
                     updated_data = []
 
@@ -216,7 +216,7 @@ class CEATask:
                                 updated_data.append(row2)
                                 writer.writerow(row2)
                                 break         
-                        if match_found == False:
+                        if not match_found:
                             print(f"Row {row1} it is not in CSV2")
         else:
             df = pd.read_csv(self.output_dataset)
@@ -224,7 +224,7 @@ class CEATask:
             
         print(f"Comparison completed. Updated CSV2 saved {self.output_dataset}")
 
-    def _csv_to_jsonl(self, csv_path, json_path, is_entity=False):
+    def _csv_to_jsonl(self, csv_path, json_path, is_entity=False, comma_in_cell=False):
         """ 
             csv_path: path to csv file
             json_path: path to json file
@@ -234,50 +234,83 @@ class CEATask:
         
         for i in range(len(df['label'])):
             if df['label'][i].split(","):     
-                uri_list = df['entity'][i].split(",")
-                label_list = df['label'][i].split(",")
-                j = 0
-                for uri in uri_list:
-                    label_list = correct_string(str(label_list[j]))
-                    if is_entity:
-                        datas.append(
-                            {
-                                "messages":  [
-                                    {
-                                        "role": "system", 
-                                        "content": "Semantic Table Interpretation"
-                                    },
-                                    {
-                                        "role": "user", 
-                                        "content": f"Please What is wikidata URI of {label_list[j]}.\nContext: {[label_list[j]]}",
-                                    },      
-                                    {
-                                        "role": "assistant", 
-                                        "content": f"{{\"entity\": {label_list[j]}, \"context\": {[label_list[j]]}, \"uri\": \"{uri}\"}}"
-                                    }
-                                ]
-                            }
-                        )
-                    else:       
-                        datas.append(
-                            {
-                                "messages":  [
-                                    {
-                                        "role": "system", 
-                                        "content": "Semantic Table Interpretation"
-                                    },
-                                    {
-                                        "role": "user", 
-                                        "content": f"Please What is wikidata URI of {label_list[j]}.\nContext: {eval(df['context'][i])}",
-                                    },      
-                                    {
-                                        "role": "assistant", 
-                                        "content": f"\"entity\": \"{label_list[j]}\", \"context\": \"{eval(df['context'][i])}\", \"uri\": \"{uri}\""
-                                    }
-                                ]
-                            }
-                        )
-                    j += 1
+                uri_list = str(df['entity'][i]).split(",")
+                if not comma_in_cell:
+                    label = df['label'][i]
+                    uri = df['entity'][i]
+                    context = eval(df['context'][i]) if ("[" and ']') in df['context'][i] else df['context'][i]
+                    for item in context:
+                        index = context.index(item)
+                        if ',' in item:
+                            item = item.split(",")
+                            if label in item:
+                                context[index] = label
+                    datas.append(
+                        {
+                            "messages":  [
+                                {
+                                    "role": "system", 
+                                    "content": "Semantic Table Interpretation"
+                                },
+                                {
+                                    "role": "user", 
+                                    "content": f"Please What is wikidata URI of {label}.\nContext: {context}",
+                                },      
+                                {
+                                    "role": "assistant", 
+                                    "content": f"{{\"entity\": {label}, \"context\": {context}, \"uri\": \"{uri}\"}}"
+                                }
+                            ]
+                        }
+                    )
+                else:
+                    j = 0
+                    label_list = df['label'][i].split(",")
+                    if len(uri_list) != len(label_list):
+                        raise ValueError("error", df['tab_id'][i])
+                    for uri in uri_list:
+                        label = correct_string(str(label_list[j]))
+                        context = eval(df['context'][i]) if ("[" and ']') in df['context'][i] else df['context'][i]
+                        if is_entity:
+                            datas.append(
+                                {
+                                    "messages":  [
+                                        {
+                                            "role": "system", 
+                                            "content": "Semantic Table Interpretation"
+                                        },
+                                        {
+                                            "role": "user", 
+                                            "content": f"Please What is wikidata URI of {label}.\nContext: {context}",
+                                        },      
+                                        {
+                                            "role": "assistant", 
+                                            "content": f"{{\"entity\": {label}, \"context\": {context}, \"uri\": \"{uri}\"}}"
+                                        }
+                                    ]
+                                }
+                            )
+                        else:       
+                            datas.append(
+                                {
+                                    "messages":  [
+                                        {
+                                            "role": "system", 
+                                            "content": "Semantic Table Interpretation"
+                                        },
+                                        {
+                                            "role": "user", 
+                                            "content": f"Please What is wikidata URI of {label_list[j]}.\nContext: {context}",
+                                        },      
+                                        {
+                                            "role": "assistant", 
+                                            "content": f"\"entity\": \"{label_list[j]}\", \"context\": \"{context}\", \"uri\": \"{uri}\""
+                                        }
+                                    ]
+                                }
+                            )
+                        j += 1
+                
             else:
                 print("not split available")
         
@@ -644,6 +677,7 @@ class CEATask:
                     df = pd.read_csv(dataset_path) # open file with pandas
                     datas = df.values.tolist()
                     print(len(df))
+                    i = 0
                     for data in datas[split:]:
                         updated_cea_data = []   # at each iteration in reader_data, empty the list
                         label =  df['label'][i]       
@@ -770,7 +804,7 @@ class CEATask:
                         i += 1  
                                 
                         #  write data in update cea file
-                        writer.writerows(updated_cea_data)
+                        writer.writerows([updated_cea_data])
                         print("*************************")
                         print(f"Cell {i} annotated")
                         print("*************************")

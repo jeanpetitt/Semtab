@@ -169,7 +169,8 @@ class CTATask:
     def _makeDataset(
         self,
         header=True,
-        is_train=True
+        is_train=True,
+        split=0
     ):
         """ 
             This function take two csv file which are almost same and compare the rows of the two files
@@ -188,8 +189,9 @@ class CTATask:
                 csv2_data = [row for row in _reader2]     
                   
                 with open(self.output_dataset, 'w', newline='') as updated_file:
+                    writer = csv.writer(updated_file)
                     writer.writerow(["tab_id", "col_id", "entities", "entity_type"]) 
-                    for row1 in csv1_data:
+                    for row1 in csv1_data[split:]:
                         match_found = False
                         for row2 in csv2_data:
                             updated_data = []
@@ -200,7 +202,6 @@ class CTATask:
                                 else: 
                                     row2.append("NIL")
                                 updated_data.append(row2)
-                                writer = csv.writer(updated_file)
                                 writer.writerow(updated_data)
                                 # print(f"Row {row1} it is in CSV2")
                                 break         

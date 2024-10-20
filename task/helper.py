@@ -22,14 +22,14 @@ def getNameCsvFile(path):
         data.append(i) 
     # remove duplicate key
     for i in data[0:]:
+        i += ".csv"
         if i not in not_duplicate_tab_id:
-            i += ".csv"
             not_duplicate_tab_id.append(i)
     
     return not_duplicate_tab_id
 
 
-def getAllCellInTableColByBCol(table, is_vertical, comma_in_cell):
+def getAllCellInTableColByBCol(table, is_entity, comma_in_cell):
     """_summary_
         
     Args:
@@ -56,7 +56,7 @@ def getAllCellInTableColByBCol(table, is_vertical, comma_in_cell):
                         if is_valid_format(x):
                             elts.append(x)
                         else:
-                            elts.append(random.choice(str(x).split(",")).strip())
+                            elts.append(random.choice(str(x).split(",")).strip(" "))
                     cols_row_not_nan = elts
                 if is_valid_format(str(row[cols])):
                     new_rows = [row[cols]]
@@ -65,8 +65,19 @@ def getAllCellInTableColByBCol(table, is_vertical, comma_in_cell):
                 
                 new_rows = find_element_or_choice(new_rows)
                 
-                if is_vertical:
-                    # check if row a row contain more than 15 elements
+                # do it if type of table is entity
+                if is_entity:  
+                    values = table[1].values.tolist()
+                    cols_row_not_nan = [x for x in values if (not isinstance(x, float) and not is_date(str(x)) and not is_number(str(x)) and is_valid_string(str(x)) and not contains_html_tags(str(x)) and not 'http' in str(x))]
+                    if comma_in_cell:
+                        elts = []
+                        for x in cols_row_not_nan:
+                            if is_valid_format(x):
+                                elts.append(x)
+                            else:
+                                elts.append(random.choice(str(x).split(",")).strip(" "))
+                        cols_row_not_nan = elts
+                    choice_element = cols_row_not_nan[1:]
                     if len(cols_row_not_nan) > 5:
                         choice_element = random.sample(cols_row_not_nan[1:], k=5)
                     else:
@@ -106,7 +117,7 @@ def getAllCellInTableRowByRow(table, comma_in_cell):
                     # cols_row_not_nan = [random.choice(str(x).split(",")).strip() for x in cols_row_not_nan]
                     elts = []
                     for x in cols_row_not_nan:
-                        if is_valid_format(x):
+                        if is_valid_format(str(x)):
                             elts.append(x)
                         else:
                             elts.append(random.choice(str(x).split(",")).strip())

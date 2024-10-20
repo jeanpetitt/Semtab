@@ -25,6 +25,7 @@ def make_dataset():
     table_path = request.json.get('table_path', "")
     is_train = request.json.get('is_train', True)
     header = request.json.get('header', True)
+    split = request.json.get('split', 0)
     path = f"results/dataset/{task}"
     # End Form
     if task.lower() == "ra":
@@ -37,11 +38,11 @@ def make_dataset():
         if not os.path.exists(path):
             path = os.makedirs(path)
         if is_train:
-            ra_task.set_dataset_path(f"{path}/dataset_{ra_task.get_dataset_name()}_{task}_train.csv")
+            ra_task.set_dataset_path(f"{path}/dataset_{ra_task.get_dataset_name()}_{task}_train_split_{split}.csv")
         else:
-            ra_task.set_dataset_path(f"{path}/dataset_{ra_task.get_dataset_name()}_{task}_test.csv")
+            ra_task.set_dataset_path(f"{path}/dataset_{ra_task.get_dataset_name()}_{task}_test_split_{split}.csv")
         try:
-            ra_task._makeDataset(header=header, is_train=is_train)
+            ra_task._makeDataset(header=header, is_train=is_train, split=split)
             return jsonify({
                 "dataset_path": ra_task.get_dataset_path(),
                 "table_path": ra_task.target_file_gt,
@@ -66,10 +67,16 @@ def make_dataset():
         if not os.path.exists(path):
             path = os.makedirs(path)
         if is_train:
-            cpa_task.set_dataset_path(f"{path}/dataset_{cpa_task.get_dataset_name()}_{task}_train.csv")
+            cpa_task.set_dataset_path(f"{path}/dataset_{cpa_task.get_dataset_name()}_{task}_train_split_{split}.csv")
         else:
-            cpa_task.set_dataset_path(f"{path}/dataset_{cpa_task.get_dataset_name()}_{task}_test.csv")
-        cpa_task._makeDataset(header=header, is_train=is_train, is_horizontal=is_horizontal, is_entity=is_entity)
+            cpa_task.set_dataset_path(f"{path}/dataset_{cpa_task.get_dataset_name()}_{task}_test_split_{split}.csv")
+        cpa_task._makeDataset(
+            header=header,
+            is_train=is_train,
+            is_horizontal=is_horizontal,
+            is_entity=is_entity,
+            split=split
+        )
         try:
             return jsonify({
                 "dataset_path": cpa_task.get_dataset_path(),
@@ -84,11 +91,10 @@ def make_dataset():
                 "message": "Error during the process:",
             }), 400
     elif task.lower() == "cea":       
-        is_vertical = request.json.get('is_vertical', False)
+        is_entity = request.json.get('is_entity', False)
         transpose = request.json.get('transpose', False)
-        col_before_row = request.json.get('col_before_row', False)
-        coma_in_cell = request.json.get('coma_in_cell', False)
-        split = request.json.get('split', False)
+        col_before_row = request.json.get('col_before_row', True)
+        comma_in_cell = request.json.get('comma_in_cell', False)
         cea_task = CEATask(
             dataset_name=dataset_name,
             table_path=table_path,
@@ -98,15 +104,15 @@ def make_dataset():
         if not os.path.exists(path):
             path = os.makedirs(path)
         if is_train:
-            cea_task.set_dataset_path(f"{path}/dataset_{cea_task.get_dataset_name()}_{task}_train.csv")
+            cea_task.set_dataset_path(f"{path}/dataset_{cea_task.get_dataset_name()}_{task}_train_split_{split}.csv")
         else:
-            cea_task.set_dataset_path(f"{path}/dataset_{cea_task.get_dataset_name()}_{task}_test.csv")
+            cea_task.set_dataset_path(f"{path}/dataset_{cea_task.get_dataset_name()}_{task}_test_split_{split}.csv")
         cea_task._makeDataset(
             header=header, 
-            is_vertical=is_vertical, 
+            is_entity=is_entity, 
             transpose=transpose, 
             col_before_row=col_before_row,
-            comma_in_cell=coma_in_cell,
+            comma_in_cell=comma_in_cell,
             is_train=is_train,
             split=split
         )
@@ -124,9 +130,59 @@ def make_dataset():
                 "message": "Error during the process:",
             }), 400
     elif task.lower() == "cta":
-        return jsonify({"message": task}), 200
+        cta_task = CTATask(
+            dataset_name=dataset_name,
+            table_path=table_path,
+            target_file=target_path, 
+            target_file_gt=target_gt_path
+        )
+        if not os.path.exists(path):
+            path = os.makedirs(path)
+        if is_train:
+            cta_task.set_dataset_path(f"{path}/dataset_{ra_task.get_dataset_name()}_{task}_train_split_{split}.csv")
+        else:
+            cta_task.set_dataset_path(f"{path}/dataset_{ra_task.get_dataset_name()}_{task}_test_split_{split}.csv")
+        try:
+            cta_task._makeDataset(header=header, is_train=is_train, split=split)
+            return jsonify({
+                "dataset_path": cta_task.get_dataset_path(),
+                "table_path": cta_task.target_file_gt,
+                "task": "Row Annotation",
+                "status": "succes",
+                "code": 200
+            })
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "Error during the process:",
+            }), 400
     elif task.lower() == "td":
-        return jsonify({"message": task}), 200
+        td_task = TDTask(
+            dataset_name=dataset_name,
+            table_path=table_path,
+            target_file=target_path, 
+            target_file_gt=target_gt_path
+        )
+        if not os.path.exists(path):
+            path = os.makedirs(path)
+        if is_train:
+            td_task.set_dataset_path(f"{path}/dataset_{ra_task.get_dataset_name()}_{task}_train_split_{split}.csv")
+        else:
+            td_task.set_dataset_path(f"{path}/dataset_{ra_task.get_dataset_name()}_{task}_test_split_{split}.csv")
+        try:
+            td_task._makeDataset(header=header, is_train=is_train, split=split)
+            return jsonify({
+                "dataset_path": td_task.get_dataset_path(),
+                "table_path": td_task.target_file_gt,
+                "task": "Row Annotation",
+                "status": "succes",
+                "code": 200
+            })
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "Error during the process:",
+            }), 400
     else:
         return jsonify({"message": "task does not exist"}), 400
     
@@ -336,6 +392,136 @@ def evaluate():
     else:
         return jsonify({"message": "task does not exist"}), 400
     
+@app.route('/parse_csv_to_json', methods=['POST'])
+def parse_csv_to_json():
+     # Fill form to make dataset
+    task = request.json.get('task', "cea")
+    dataset_name = request.json.get('dataset_name', "")
+    csv_path = request.json.get('csv_path', "")
+    is_entity = request.json.get('is_entity', "")
+    comma_in_cell = request.json.get('comma_in_cell', "")
+    path = f"results/jsonl/{task}"
+    # End Form
+    if task.lower() == "ra":
+        ra_task = RATask(
+            dataset_name=dataset_name
+        )
+
+        if not os.path.exists(path):
+            path = os.makedirs(path)
+        
+        try:
+            ra_task._csv_to_jsonl(
+                csv_path=csv_path,
+                json_path=f"{path}/{dataset_name}_{task}.jsonl"
+            )
+            return jsonify({
+                "task": "Cell Entity Annotation",
+                "status": "succes",
+                "code": 200
+            })
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "Error during the process:",
+            }), 400
+    elif task.lower() == 'cpa':
+        
+        cpa_task = CPATask(
+            dataset_name=dataset_name
+        )
+
+        if not os.path.exists(path):
+            path = os.makedirs(path)
+        
+        try:
+            cpa_task._csv_to_jsonl(
+                csv_path=csv_path,
+                json_path=f"{path}/{dataset_name}_{task}.jsonl"
+            )
+            return jsonify({
+                "task": "Column Property Annotation",
+                "status": "succes",
+                "code": 200
+            })
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "Error during the process:",
+            }), 400
+    elif task.lower() == "cea":
+        cea_task = CEATask(
+            dataset_name=dataset_name
+        )
+
+        if not os.path.exists(path):
+            path = os.makedirs(path)
+        
+        cea_task._csv_to_jsonl(
+                csv_path=csv_path,
+                json_path=f"{path}/{dataset_name}_{task}.jsonl",
+                comma_in_cell=comma_in_cell,
+                is_entity=is_entity
+            )
+        try:
+            return jsonify({
+                "task": "Cell Entity Annotation",
+                "status": "succes",
+                "code": 200
+            })
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "Error during the process:",
+            }), 400
+    elif task.lower() == "cta":
+        cta_task = CTATask(
+            dataset_name=dataset_name
+        )
+
+        if not os.path.exists(path):
+            path = os.makedirs(path)
+        
+        try:
+            cta_task._csv_to_jsonl(
+                csv_path=csv_path,
+                json_path=f"{path}/{dataset_name}_{task}.jsonl"
+            )
+            return jsonify({
+                "task": "Column Type Annotation",
+                "status": "succes",
+                "code": 200
+            })
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "Error during the process:",
+            }), 400
+    elif task.lower() == "td":
+        td_task = TDTask(
+            dataset_name=dataset_name
+        )
+
+        if not os.path.exists(path):
+            path = os.makedirs(path)
+        
+        try:
+            td_task._csv_to_jsonl(
+                csv_path=csv_path,
+                json_path=f"{path}/{dataset_name}_{task}.jsonl"
+            )
+            return jsonify({
+                "task": "Table Detection",
+                "status": "succes",
+                "code": 200
+            })
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "Error during the process:",
+            }), 400
+    else:
+        return jsonify({"message": "task does not exist"}), 400
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

@@ -161,7 +161,8 @@ class RATask:
     def _makeDataset(
         self,
         header=True,
-        is_train=True
+        is_train=True,
+        split=0
     ):
         """ _summary_
                 This function take two csv file which are almost same and compare the rows of the two files
@@ -181,12 +182,10 @@ class RATask:
                 csv1_data = [row for row in _reader1]
                 csv2_data = [row for row in _reader2]     
                 
-                updated_data = []
-                if is_train:
-                    updated_data.append(["tab_id", "row_id", "record", "uri"])
-                else:
-                    updated_data.append(["tab_id", "row_id", "record"])          
-                for row1 in csv1_data:
+            with open(self.output_dataset, 'w', newline='') as updated_file:
+                writer = csv.writer(updated_file) 
+                writer.writerow(["tab_id", "row_id", "record", "uri"])       
+                for row1 in csv1_data[split:]:
                     # print(row1, self.target_file_gt, self.target_file)
                     match_found = False
                     for row2 in csv2_data:
@@ -196,14 +195,11 @@ class RATask:
                                 row2.append(row1[2])
                             else:
                                 row2.append("NIL")
-                            updated_data.append(row2)
+                            writer.writerow(row2)  
                             # print(f"Row {row1} it is in CSV2")
                             break         
                     if match_found == False:
-                        print(f"Row {row1} it is not in CSV2") 
-            with open(self.output_dataset, 'w', newline='') as updated_file:
-                writer = csv.writer(updated_file)
-                writer.writerows(updated_data)       
+                        print(f"Row {row1} it is not in CSV2")      
             print("Comparison completed. Updated CSV2 saved as 'updated_csv2.csv'.")
         else:
             df = pd.read_csv(self.output_dataset)

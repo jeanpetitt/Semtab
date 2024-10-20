@@ -288,6 +288,7 @@ class CPATask:
         is_entity=True,
         is_horizontal=False,
         is_train=True,
+        split=0
     ):
         """ 
             This function take two csv file which are almost same and compare the rows of the two files
@@ -310,41 +311,40 @@ class CPATask:
                 csv1_data = [row for row in _reader1]
                 csv2_data = [row for row in _reader2] 
                 
-                updated_data = []
-                if is_entity:
-                    updated_data.append(["tab_id", "col_j", "col_label", "list_col", "entity"])
-                else:
-                    updated_data.append(["tab_id", "col0", "col_j", "col_label", "list_col", "entity"])
-                for row1 in csv1_data:
-                    match_found = False
-                    for row2 in csv2_data:
-                        if is_entity:
-                            if row1[:2] == row2[:2]:
-                                match_found = True
-                                if is_train:
-                                    row2.append(row1[2])
-                                else:
-                                    row2.append("NIL")
-                                updated_data.append(row2)
-                                # print(f"Row {row1} it is in CSV2")
-                                break    
-                        else:
-                            if row1[:3] == row2[:3]:
-                                match_found = True
-                                if is_train:
-                                    row2.append(row1[3])
-                                else:
-                                    row2.append("NIL")
-                                updated_data.append(row2)
-                                # print(f"Row {row1} it is in CSV2")
-                                break      
-                    if match_found == False:
-                        print(f"Row {row1} it is not in CSV2")
-                
                 with open(self.output_dataset, 'w', newline='') as updated_file:
                     writer = csv.writer(updated_file)
-                    writer.writerows(updated_data)       
-                print("Comparison completed. Updated CSV2 saved as 'updated_csv2.csv'.")
+                    updated_data = []
+                    if is_entity:
+                        updated_data.extend(["tab_id", "col_j", "col_label", "list_col", "entity"])
+                    else:
+                        updated_data.extend(["tab_id", "col0", "col_j", "col_label", "list_col", "entity"])
+                    writer.writerows([updated_data])
+                    for row1 in csv1_data[split:]:
+                        match_found = False
+                        for row2 in csv2_data:
+                            if is_entity:
+                                if row1[:2] == row2[:2]:
+                                    match_found = True
+                                    if is_train:
+                                        row2.append(row1[2])
+                                    else:
+                                        row2.append("NIL")
+                                    writer.writerow(row2)
+                                    # print(f"Row {row1} it is in CSV2")
+                                    break    
+                            else:
+                                if row1[:3] == row2[:3]:
+                                    match_found = True
+                                    if is_train:
+                                        row2.append(row1[3])
+                                    else:
+                                        row2.append("NIL")
+                                    writer.writerow(row2)
+                                    # print(f"Row {row1} it is in CSV2")
+                                    break      
+                        if match_found == False:
+                            print(f"Row {row1} it is not in CSV2")       
+                    print("Comparison completed. Updated CSV2 saved as 'updated_csv2.csv'.")
         else:
             df = pd.read_csv(self.output_dataset)
             datas = df.values.tolist()

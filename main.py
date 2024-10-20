@@ -1,9 +1,9 @@
-from object_task import *
-from evaluation.cea_evaluator import CEA_Evaluator
+from object_task import gpttuner
+# from evaluation.cea_evaluator import CEA_Evaluator
 from finetuning.utils import inference, combineJsonFile
-from evaluation.cta_evaluator import CTA_Evaluator
-from evaluation.ra_evaluator import RA_Evaluator
-from evaluation.td_evaluator import TD_Evaluator
+# from evaluation.cta_evaluator import CTA_Evaluator
+# from evaluation.ra_evaluator import RA_Evaluator
+# from evaluation.td_evaluator import TD_Evaluator
 from evaluation.cpa_evaluator import CPA_Evaluator
 from path_data.push_data_on_hub import push_dataset_to_hub
 
@@ -54,10 +54,10 @@ if __name__ == "__main__":
             # R2_test_cpa_task_tbiodiv_hor._makeDataset(is_entity=False, is_horizontal=True)
             
             """========== CEA Task============"""
-            # R2_test_cea_task_tbiomed_entity._makeDataset(is_vertical=True, comma_in_cell=True)
+            # R2_test_cea_task_tbiomed_entity._makeDataset(is_entity=True, comma_in_cell=True)
             # R2_test_cea_task_tbiodiv_hor._makeDataset(header=True, comma_in_cell=True)
             # R2_test_cea_task_tbiomed_hor._makeDataset(header=True, comma_in_cell=True)
-            # R2_test_cea_task_tbiodiv_entity._makeDataset(is_vertical=True, comma_in_cell=True)
+            # R2_test_cea_task_tbiodiv_entity._makeDataset(is_entity=True, comma_in_cell=True)
             # R2_test_cea_task_wikidata_24._makeDataset(header=True, col_before_row=False, is_train=False, split=1496521)
             """========== RA Task================"""
             # R2_ra_task_tbiodiv_hor._makeDataset(header=True)
@@ -75,13 +75,14 @@ if __name__ == "__main__":
             # cea_task_wikidata_24._makeDataset(header=True, col_before_row=False)
             # cea_task_tbiodiv_hor._makeDataset(header=True, comma_in_cell=True)
             # cea_task_tbiomed_hor._makeDataset(header=True, comma_in_cell=True)
-            # cea_task_tbiomed_entity._makeDataset(is_vertical=True, comma_in_cell=True)
-            # cea_task_tbiodiv_entity._makeDataset(is_vertical=True, comma_in_cell=True)
+            # cea_task_tbiomed_entity._makeDataset(is_entity=True, comma_in_cell=True)
+            # cea_task_tbiodiv_entity._makeDataset(is_entity=True, comma_in_cell=True)
             # test_cea_task_llm._makeDataset(
             #     header=True,
             #     is_train=False,
             #     transpose=True
             # )
+            
             # test_cea_task_tbiodiv_hor._makeDataset(header=True, comma_in_cell=True, is_train=False)
             # test_cea_task_tbiomed_hor._makeDataset(header=True, comma_in_cell=True, is_train=False)
             # test_cea_task_tbiodiv_entity._makeDataset(is_vertical=True, comma_in_cell=True, is_train=False)
@@ -141,42 +142,42 @@ if __name__ == "__main__":
             """ llm 2024 """
             """================Round2================"""
             "==============TD task=================="
-            R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
-                csv_path=cpa_dataset_tbiodiv_entity,
-                json_path='data/json/Round1/cpa/tbiodiv/entity.jsonl'
-            )
-            R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
-                csv_path=cpa_dataset_tbiodiv_hor,
-                json_path='data/json/Round1/cpa/tbiodiv/hor.jsonl'
-            )
-            R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
-                csv_path=cpa_dataset_tbiomed_hor,
-                json_path='data/json/Round1/cpa/tbiomed/hor.jsonl'
-            )
-            R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
-                csv_path=cpa_dataset_tbiomed_entity,
-                json_path='data/json/Round1/cpa/tbiomed/entity.jsonl'
-            )
-            R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
-                csv_path=cpa_dataset_wikidata_24,
-                json_path='data/json/Round1/cpa/wikidata/wikidata.jsonl'
-            )
-            R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
-                csv_path=R2_cpa_dataset_tbiomed_entity,
-                json_path=R2_cpa_dataset_json_tbiomed_entity
-            )
-            R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
-                csv_path=R2_cpa_dataset_tbiodiv_entity,
-                json_path=R2_cpa_dataset_json_tbiodiv_entity
-            )
-            R2_test_cpa_task_tbiodiv_hor._csv_to_jsonl(
-                csv_path=R2_cpa_dataset_tbiodiv_hor,
-                json_path=R2_cpa_dataset_json_tbiodiv_hor
-            )
-            R2_test_cpa_task_tbiodiv_hor._csv_to_jsonl(
-                csv_path=R2_cpa_dataset_tbiomed_hor,
-                json_path=R2_cpa_dataset_json_tbiomed_hor
-            )
+            # R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
+            #     csv_path=cpa_dataset_tbiodiv_entity,
+            #     json_path='data/json/Round1/cpa/tbiodiv/entity.jsonl'
+            # )
+            # R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
+            #     csv_path=cpa_dataset_tbiodiv_hor,
+            #     json_path='data/json/Round1/cpa/tbiodiv/hor.jsonl'
+            # )
+            # R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
+            #     csv_path=cpa_dataset_tbiomed_hor,
+            #     json_path='data/json/Round1/cpa/tbiomed/hor.jsonl'
+            # )
+            # R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
+            #     csv_path=cpa_dataset_tbiomed_entity,
+            #     json_path='data/json/Round1/cpa/tbiomed/entity.jsonl'
+            # )
+            # R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
+            #     csv_path=cpa_dataset_wikidata_24,
+            #     json_path='data/json/Round1/cpa/wikidata/wikidata.jsonl'
+            # )
+            # R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
+            #     csv_path=R2_cpa_dataset_tbiomed_entity,
+            #     json_path=R2_cpa_dataset_json_tbiomed_entity
+            # )
+            # R2_test_cpa_task_tbiodiv_entity._csv_to_jsonl(
+            #     csv_path=R2_cpa_dataset_tbiodiv_entity,
+            #     json_path=R2_cpa_dataset_json_tbiodiv_entity
+            # )
+            # R2_test_cpa_task_tbiodiv_hor._csv_to_jsonl(
+            #     csv_path=R2_cpa_dataset_tbiodiv_hor,
+            #     json_path=R2_cpa_dataset_json_tbiodiv_hor
+            # )
+            # R2_test_cpa_task_tbiodiv_hor._csv_to_jsonl(
+            #     csv_path=R2_cpa_dataset_tbiomed_hor,
+            #     json_path=R2_cpa_dataset_json_tbiomed_hor
+            # )
             
             
             # cea_task_llm._csv_to_jsonl(
@@ -261,15 +262,15 @@ if __name__ == "__main__":
             # )
             print("\n")
         elif choice == "5":
-            gpttuner.fineTuningJobID(
+            # gpttuner.fineTuningJobID(
                 # training_path="json dataset/CPA_Conversational2024_train.jsonl", 
                 # validation_file_path="json dataset/CPA_Conversational2024_val.jsonl"
                 # training_file_id=
-            )
-            # gpttuner.fineTuningJobID(
-            #     training_path="train_llm1.jsonl",
-            #     # validation_file_path="val_llm1.jsonl"
             # )
+            gpttuner.fineTuningJobID(
+                training_file_id="file-XPdiMztf6EayLe1BD7bjcHPT",
+                val_file_id="file-kI2D93v8W7nPmUkAkiul6IwE"
+            )
             print("\n")
         elif choice == "6":
             # inference(model=ra_model_finetuned)

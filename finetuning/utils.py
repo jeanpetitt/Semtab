@@ -62,7 +62,12 @@ class Gpt3FinetuningProcess:
         print(f"File uploaded successfully with ID: { fileID}")
         return fileID
     
-    def fineTuningJobID(self, training_file_id=None, training_path=None, validation_file_path=None, val_file_id=None):
+    def fineTuningJobID(self, 
+            training_file_id=None,
+            training_path=None,
+            validation_file_path=None, 
+            val_file_id=None
+        ):
         """_summary_
 
         Args:
