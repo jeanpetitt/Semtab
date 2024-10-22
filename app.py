@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from evaluation.cea_evaluator import CEA_Evaluator
 from task.ra import RATask
 from task.cpa import CPATask
 from task.cea import CEATask
@@ -9,7 +10,7 @@ from evaluation.ra_evaluator import RA_Evaluator
 from evaluation.td_evaluator import TD_Evaluator
 from evaluation.cpa_evaluator import CPA_Evaluator
 import os
-from path_data.utils import ra_model_finetuned, cpa_model_finetuned, cea_model_finetuned_4, td_model_finetuned_2, td_model_finetuned_1
+from path_data.utils import ra_model_finetuned, cpa_model_finetuned, cta_model_finetuned_2, cea_model_finetuned_5, td_model_finetuned_2, td_model_finetuned_1
 
 app = Flask(__name__)
 
@@ -262,7 +263,7 @@ def annotate():
         else:
             cea_task.set_annotated_file_path(f"{path}/annotate_{cea_task.get_dataset_name()}_{task}_test_{split}.csv")
         cea_task._annotate(
-            model=cea_model_finetuned_4,
+            model=cea_model_finetuned_5,
             path=dataset_path,
             split=split,
             is_symbolic=is_symbolic,
@@ -294,7 +295,7 @@ def annotate():
         else:
             cta_task.set_annotated_file_path(f"{path}/annotate_{cta_task.get_dataset_name()}_{task}_test_{split}.csv")
         cta_task._annotate(
-            model=cpa_model_finetuned,
+            model=cta_model_finetuned_2,
             path=dataset_path,
             split=split,
             is_combine_approach=is_combine_approach
@@ -356,7 +357,7 @@ def evaluate():
     # Fill form to make dataset
     task = request.json.get('task', "")
     target_path = request.json.get('target_path', "")
-    soumission_path = request.json.get('soumission_path', "")
+    submition_path = request.json.get('submition_path', "")
     is_entity = request.json.get('is_entity', True)
     _client_payload = {}
     # End Form
@@ -368,7 +369,7 @@ def evaluate():
         })
     elif task.lower() == 'cpa':
         
-        _client_payload["submission_file_path"] = soumission_path
+        _client_payload["submission_file_path"] = submition_path
         aicrowd_evaluator = CPA_Evaluator(target_path, is_entity=is_entity)  # ground truth
         result = aicrowd_evaluator._evaluate(_client_payload)
         try:
@@ -384,7 +385,21 @@ def evaluate():
                 "message": "Error during the process:",
             }), 400
     elif task.lower() == "cea":
-        return jsonify({"message": task}), 200
+        _client_payload["submission_file_path"] = submition_path
+        aicrowd_evaluator = CEA_Evaluator(target_path)  # ground truth
+        result = aicrowd_evaluator._evaluate(_client_payload)
+        try:
+            return jsonify({
+                "metric": result,
+                "task": "Column Property Annotation",
+                "status": "succes",
+                "code": 200
+            })
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "Error during the process:",
+            }), 400
     elif task.lower() == "cta":
         return jsonify({"message": task}), 200
     elif task.lower() == "td":

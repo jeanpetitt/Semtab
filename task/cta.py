@@ -627,12 +627,12 @@ class CTATask:
                                 if not result:
                                     result = "NIL"                     
                                 print(result)                        
-                        # add result of annation   
+                        # add result of annation
                         data.append(result)
                         updated_cea_data.append(data)
                             
                         #  write data in update cea file
-                        writer.writerows(updated_cea_data)
+                        writer.writerow([data[0], data[1], data[-1]])
                         print("*************************")
                         print(f"Col {i} annotated")
                         print("*************************")

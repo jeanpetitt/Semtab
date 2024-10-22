@@ -268,8 +268,9 @@ if __name__ == "__main__":
                 # training_file_id=
             # )
             gpttuner.fineTuningJobID(
-                training_file_id="file-XPdiMztf6EayLe1BD7bjcHPT",
-                val_file_id="file-kI2D93v8W7nPmUkAkiul6IwE"
+                training_file_id="file-voYYZnQNnNhEdOgInVKSdFlA",
+                # val_file_id="file-kI2D93v8W7nPmUkAkiul6IwE"
+                # training_path="json dataset/CEA_Conversational2024_full.jsonl"
             )
             print("\n")
         elif choice == "6":
