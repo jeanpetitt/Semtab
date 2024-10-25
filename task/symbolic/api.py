@@ -287,6 +287,9 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
         context_have_string_value = have_string(label_value)
     else:       
         context_have_string_value = have_string(property_values)
+    
+    if (is_ceaTask and len(entity_ids) != 0 and len(entity_ids) <=3) or len(property_values) == 0:
+        return entity_ids[0]
     for entity_id in entity_ids:
         url = f"https://www.wikidata.org/w/api.php?action=wbgetclaims&entity={entity_id}&format=json"
         response = requests.get(url)
@@ -369,6 +372,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                             'prop_value': label_value
                                         }
                                     if label in property_values:
+                                        if is_ceaTask: return f"http://www.wikidata.org/entity/{entity_id}"
                                         entity_property_values.append(label)
                                     else:
                                         continue
@@ -577,7 +581,7 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
                                                 property_values[index] = value
                                                 break
                         property_value_ids.append(claim["mainsnak"]["property"])
-
+            
     return None   
 
 def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, label_current=None, context_have_string_value=False):
@@ -669,8 +673,9 @@ def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, 
 
         except:
             print("Not entity")
-    if len(entity_ids) != 0 and isinstance(entity_ids, list):
+    if len(entity_ids) != 0:
         return entity_ids[0]
+
     return None
 
 

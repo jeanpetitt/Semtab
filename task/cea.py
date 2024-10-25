@@ -721,7 +721,7 @@ class CEATask:
                                     new_context = []
                                     if df['context'][i].lower() != 'nil':
                                         context = eval(df['context'][i])
-                                        print(label)
+                                        print("label", label)
                                         if isinstance(context, list):
                                             for item in context:
                                                 if isinstance(item, int) or isinstance(item, float):
@@ -745,7 +745,7 @@ class CEATask:
                                     else:
                                         context = ''
                                         is_context = False
-                                    print(context)
+                                    # print(context)
                                     context = new_context
                                     context_have_string_value = False
                                     for lab in context[1:]:
@@ -766,6 +766,7 @@ class CEATask:
                                             elif len(entity_ids) == 1:
                                                 result = entity_ids[0]
                                             else:
+                                                old_entity_ids = entity_ids
                                                 if label not in context and label != old_label and old_label not in context:
                                                     context = [label]
                                                 elif label not in context and label != old_label:
@@ -773,22 +774,33 @@ class CEATask:
                                                     context[index] = label
                                                 if context.index(label) != 0:
                                                     entity_ids = openUrl(context[0], context[1:])
+                                                    if not entity_ids:
+                                                        label = self.correct_spelling(context[0])
+                                                        entity_ids = openUrl(label, context[1:])
                                                     result = check_entity_properties_cea(entity_ids, context[1:], False, label, context_have_string_value)
                                                 else:
                                                     result = check_entity_properties_cea(entity_ids, context[1:], context_have_string_value=context_have_string_value)
+                                                if not result:
+                                                    result = old_entity_ids[0]
                                         else:
                                             if len(entity_ids) == 1:
                                                 result = entity_ids[0]
                                             else:
+                                                old_entity_ids = entity_ids
                                                 if label not in context:
                                                     first_elt = context[0]
                                                     context.pop()
                                                     context.extend([label, first_elt])
                                                 if context.index(label) != 0:
                                                     entity_ids = openUrl(context[0], context[1:])
+                                                    if not entity_ids:
+                                                        label = self.correct_spelling(context[0])
+                                                        entity_ids = openUrl(label, context[1:])
                                                     result = check_entity_properties_cea(entity_ids, context[1:], False, label, context_have_string_value)
                                                 else:
                                                     result = check_entity_properties_cea(entity_ids, context[1:], context_have_string_value=context_have_string_value)
+                                                if not result:
+                                                    result = old_entity_ids[0]
                                         print(f"Label = {label}, context={context}, -> target_uri = http://www.wikidata.org/entity/{result}")
                                     else:
                                         result = openUrl(label)                       
@@ -810,7 +822,10 @@ class CEATask:
                         i += 1  
                                 
                         #  write data in update cea file
-                        writer.writerow([data[0], data[1], data[2], data[-1]])
+                        _file.close()
+                        with open(self.file_annotated, 'a') as f:
+                            writer = csv.writer(f)
+                            writer.writerow([data[0], data[1], data[2], data[-1]])
                         print("*************************")
                         print(f"Cell {i} annotated")
                         print("*************************")

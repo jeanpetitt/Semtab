@@ -38,7 +38,7 @@ def make_dataset():
         )
         if not os.path.exists(f"{path}/{task}"):
             os.makedirs(f"{path}/{task}")
-            path = f"{path}/{task}"
+        path = f"{path}/{task}"
         if is_train:
             ra_task.set_dataset_path(f"{path}/dataset_{ra_task.get_dataset_name()}_{task}_train_split_{split}.csv")
         else:
@@ -68,7 +68,7 @@ def make_dataset():
         )
         if not os.path.exists(f"{path}/{task}"):
             os.makedirs(f"{path}/{task}")
-            path = f"{path}/{task}"
+        path = f"{path}/{task}"
         if is_train:
             cpa_task.set_dataset_path(f"{path}/dataset_{cpa_task.get_dataset_name()}_{task}_train_split_{split}.csv")
         else:
@@ -106,7 +106,7 @@ def make_dataset():
         )
         if not os.path.exists(f"{path}/{task}"):
             os.makedirs(f"{path}/{task}")
-            path = f"{path}/{task}"
+        path = f"{path}/{task}"
         if is_train:
             cea_task.set_dataset_path(f"{path}/dataset_{cea_task.get_dataset_name()}_{task}_train_split_{split}.csv")
         else:
@@ -142,7 +142,7 @@ def make_dataset():
         )
         if not os.path.exists(f"{path}/{task}"):
             os.makedirs(f"{path}/{task}")
-            path = f"{path}/{task}"
+        path = f"{path}/{task}"
         if is_train:
             cta_task.set_dataset_path(f"{path}/dataset_{ra_task.get_dataset_name()}_{task}_train_split_{split}.csv")
         else:
@@ -170,7 +170,7 @@ def make_dataset():
         )
         if not os.path.exists(f"{path}/{task}"):
             os.makedirs(f"{path}/{task}")
-            path = f"{path}/{task}"
+        path = f"{path}/{task}"
         if is_train:
             td_task.set_dataset_path(f"{path}/dataset_{ra_task.get_dataset_name()}_{task}_train_split_{split}.csv")
         else:
