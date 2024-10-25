@@ -60,9 +60,9 @@ def openUrl(query, context=None, is_horizontal=True):
     best_result = []
   
     print(query)
-    try:
-            response = requests.get(url, params=params)
-            if "search" in response.json():
+    # try:
+    response = requests.get(url, params=params)
+    if "search" in response.json():
                 result = response.json()["search"]
                 if is_horizontal:           
                     if len(result) == 1:
@@ -142,18 +142,18 @@ def openUrl(query, context=None, is_horizontal=True):
                             return []
                         else:
                             return None
-            else:
+    else:
                 if context:
                     return []
                 else:
                     return None
 
-    except:
-        print("Internet connection error")
-        if context:
-            return []
-        else:
-            return None
+    # except:
+    #     print("Internet connection error")
+    #     if context:
+    #         return []
+    #     else:
+    #         return None
         
 def get_entity_with_id(entity_id):
     url = "https://www.wikidata.org/w/api.php"
@@ -669,6 +669,8 @@ def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, 
 
         except:
             print("Not entity")
+    if len(entity_ids) != 0:
+        return entity_ids[0]
     return None
 
 
