@@ -262,6 +262,7 @@ def annotate():
     elif task.lower() == "cea":
         is_symbolic = request.json.get('is_symbolic', False)
         is_connectionist = request.json.get('is_connectionist', True)
+        split_end = request.json.get('split_end', None)
         is_context = request.json.get('is_context', False)
         cea_task = CEATask(
             dataset_name=dataset_name,
@@ -277,7 +278,8 @@ def annotate():
         cea_task._annotate(
             model=cea_model_finetuned_6,
             path=dataset_path,
-            split=split,
+            split_start=split,
+            split_end=split_end,
             is_symbolic=is_symbolic,
             is_connectionist=is_connectionist,
             is_context=is_context

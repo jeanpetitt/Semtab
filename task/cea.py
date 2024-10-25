@@ -501,7 +501,8 @@ class CEATask:
         self,
         model,
         path=None,
-        split=0,
+        split_start=0,
+        split_end=None,
         is_symbolic=False,
         is_connectionist=True,
         is_context=False
@@ -539,8 +540,10 @@ class CEATask:
                     if dataset_path.endswith(".csv"):
                         print(dataset_path)
                         df = pd.read_csv(dataset_path, dtype=str) # open file with pandas
-                        i = split
-                        for data in target_data[split:]:
+                        i = split_start
+                        if not split_end:
+                            split_end = len(df)
+                        for data in target_data[split_start:split_end]:
                             updated_cea_data = []   # at each iteration in reader_data, empty the list
                             label =  df['label'][i]     
             
@@ -668,8 +671,8 @@ class CEATask:
                         else:
                             print("it is not csv file")
         else:
-            with open(self.file_annotated, 'w', newline='') as updated_file:
-                writer = csv.writer(updated_file)
+            with open(self.file_annotated, 'w') as _file:
+                writer = csv.writer(_file)
                 # writer.writerow(header_cea)
                 # check if it is csv file
                 if dataset_path.endswith(".csv"):
@@ -677,8 +680,10 @@ class CEATask:
                     df = pd.read_csv(dataset_path) # open file with pandas
                     datas = df.values.tolist()
                     print(len(df))
-                    i = split
-                    for data in datas[split:]:
+                    i = split_start
+                    if not split_end:
+                        split_end = len(df)
+                    for data in datas[split_start:split_end]:
                         updated_cea_data = []   # at each iteration in reader_data, empty the list
                         label =  df['label'][i]       
                         if not label:
@@ -800,11 +805,12 @@ class CEATask:
                                         result = self.inference(model_id=model, user_input=user_input)
                             
                         data.append(result)
+                        print(data)
                         updated_cea_data.extend([data[0], data[1], data[2], data[-1]])
                         i += 1  
                                 
                         #  write data in update cea file
-                        writer.writerows([updated_cea_data])
+                        writer.writerow([data[0], data[1], data[2], data[-1]])
                         print("*************************")
                         print(f"Cell {i} annotated")
                         print("*************************")
