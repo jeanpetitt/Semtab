@@ -7,12 +7,12 @@ from task.td import TDTask
 from path_data.utils import *
 
 gpttuner = Gpt3FinetuningProcess(
-    name="annotator-cea-02-24", 
+    name="annotator-ra-02-24", 
     # base_model="gpt-4o-mini-2024-07-18",
-    base_model=cea_model_finetuned_5,
+    base_model=ra_model_finetuned_1,
     hyperparameter = {
-        'n_epochs': 3,
-        'batch_size': 1,
+        'n_epochs': 6,
+        'batch_size': 2,
         "learning_rate_multiplier": 8,
     },
     # hyperparameter= {}

@@ -10,7 +10,7 @@ from evaluation.ra_evaluator import RA_Evaluator
 from evaluation.td_evaluator import TD_Evaluator
 from evaluation.cpa_evaluator import CPA_Evaluator
 import os
-from path_data.utils import ra_model_finetuned, cpa_model_finetuned, cta_model_finetuned_2, cea_model_finetuned_5, td_model_finetuned_2, td_model_finetuned_1
+from path_data.utils import ra_model_finetuned_1, ra_model_finetuned, cpa_model_finetuned, cta_model_finetuned_2, cea_model_finetuned_5, cea_model_finetuned_6, cea_model_finetuned_4, td_model_finetuned_2, td_model_finetuned_1
 
 app = Flask(__name__)
 
@@ -27,7 +27,7 @@ def make_dataset():
     is_train = request.json.get('is_train', True)
     header = request.json.get('header', True)
     split = request.json.get('split', 0)
-    path = f"results/dataset/{task}"
+    path = f"results/dataset"
     # End Form
     if task.lower() == "ra":
         ra_task = RATask(
@@ -36,8 +36,9 @@ def make_dataset():
             target_file=target_path, 
             target_file_gt=target_gt_path
         )
-        if not os.path.exists(path):
-            path = os.makedirs(path)
+        if not os.path.exists(f"{path}/{task}"):
+            os.makedirs(f"{path}/{task}")
+            path = f"{path}/{task}"
         if is_train:
             ra_task.set_dataset_path(f"{path}/dataset_{ra_task.get_dataset_name()}_{task}_train_split_{split}.csv")
         else:
@@ -65,8 +66,9 @@ def make_dataset():
             target_file=target_path, 
             target_file_gt=target_gt_path
         )
-        if not os.path.exists(path):
-            path = os.makedirs(path)
+        if not os.path.exists(f"{path}/{task}"):
+            os.makedirs(f"{path}/{task}")
+            path = f"{path}/{task}"
         if is_train:
             cpa_task.set_dataset_path(f"{path}/dataset_{cpa_task.get_dataset_name()}_{task}_train_split_{split}.csv")
         else:
@@ -102,8 +104,9 @@ def make_dataset():
             target_file=target_path, 
             target_file_gt=target_gt_path
         )
-        if not os.path.exists(path):
-            path = os.makedirs(path)
+        if not os.path.exists(f"{path}/{task}"):
+            os.makedirs(f"{path}/{task}")
+            path = f"{path}/{task}"
         if is_train:
             cea_task.set_dataset_path(f"{path}/dataset_{cea_task.get_dataset_name()}_{task}_train_split_{split}.csv")
         else:
@@ -137,8 +140,9 @@ def make_dataset():
             target_file=target_path, 
             target_file_gt=target_gt_path
         )
-        if not os.path.exists(path):
-            path = os.makedirs(path)
+        if not os.path.exists(f"{path}/{task}"):
+            os.makedirs(f"{path}/{task}")
+            path = f"{path}/{task}"
         if is_train:
             cta_task.set_dataset_path(f"{path}/dataset_{ra_task.get_dataset_name()}_{task}_train_split_{split}.csv")
         else:
@@ -164,8 +168,9 @@ def make_dataset():
             target_file=target_path, 
             target_file_gt=target_gt_path
         )
-        if not os.path.exists(path):
-            path = os.makedirs(path)
+        if not os.path.exists(f"{path}/{task}"):
+            os.makedirs(f"{path}/{task}")
+            path = f"{path}/{task}"
         if is_train:
             td_task.set_dataset_path(f"{path}/dataset_{ra_task.get_dataset_name()}_{task}_train_split_{split}.csv")
         else:
@@ -198,21 +203,26 @@ def annotate():
     is_train = request.json.get('table_path', True)
     split = request.json.get('split', 0)
     is_entity = request.json.get('is_entity', False)
-    path = f"results/annotate/{task}"
+    path = f"results/annotate"
     # End Form
     if task.lower() == "ra":
         ra_task = RATask(
             dataset_name=dataset_name,
             output_dataset=dataset_path
         )
-        if not os.path.exists(path):
-            path = os.makedirs(path)
+        if not os.path.exists(f"{path}/{task}"):
+            os.makedirs(f"{path}/{task}")
+        path = f"{path}/{task}"
         if is_train:
             ra_task.set_annotated_file_path(f"{path}/annotate_{ra_task.get_dataset_name()}_{task}_train_{split}.csv")
         else:
             ra_task.set_annotated_file_path(f"{path}/annotate_{ra_task.get_dataset_name()}_{task}_test_{split}.csv")
+        ra_task._annotate(
+            model=ra_model_finetuned_1,
+            split=split,
+            # path=dataset_path
+        )
         try:
-            ra_task._annotate(model=ra_model_finetuned, split=split)
             return jsonify({
                 "dataset_path": ra_task.get_dataset_path(),
                 "task": "Row Annotation",
@@ -229,8 +239,9 @@ def annotate():
             dataset_name=dataset_name,
             output_dataset=dataset_path
         )
-        if not os.path.exists(path):
-            path = os.makedirs(path)
+        if not os.path.exists(f"{path}/{task}"):
+            os.makedirs(f"{path}/{task}")
+        path = f"{path}/{task}"
         if is_train:
             cpa_task.set_annotated_file_path(f"{path}/annotate_{cpa_task.get_dataset_name()}_{task}_train_{split}.csv")
         else:
@@ -256,14 +267,15 @@ def annotate():
             dataset_name=dataset_name,
             output_dataset=dataset_path
         )
-        if not os.path.exists(path):
-            path = os.makedirs(path)
+        if not os.path.exists(f"{path}/{task}"):
+            os.makedirs(f"{path}/{task}")
+        path = f"{path}/{task}"
         if is_train:
             cea_task.set_annotated_file_path(f"{path}/annotate_{cea_task.get_dataset_name()}_{task}_train_{split}.csv")
         else:
             cea_task.set_annotated_file_path(f"{path}/annotate_{cea_task.get_dataset_name()}_{task}_test_{split}.csv")
         cea_task._annotate(
-            model=cea_model_finetuned_5,
+            model=cea_model_finetuned_6,
             path=dataset_path,
             split=split,
             is_symbolic=is_symbolic,
@@ -288,8 +300,9 @@ def annotate():
             dataset_name=dataset_name,
             output_dataset=dataset_path
         )
-        if not os.path.exists(path):
-            path = os.makedirs(path)
+        if not os.path.exists(f"{path}/{task}"):
+            os.makedirs(f"{path}/{task}")
+        path = f"{path}/{task}"
         if is_train:
             cta_task.set_annotated_file_path(f"{path}/annotate_{cta_task.get_dataset_name()}_{task}_train_{split}.csv")
         else:
@@ -317,8 +330,9 @@ def annotate():
             dataset_name=dataset_name,
             output_dataset=dataset_path
         )
-        if not os.path.exists(path):
-            path = os.makedirs(path)
+        if not os.path.exists(f"{path}/{task}"):
+            os.makedirs(f"{path}/{task}")
+        path = f"{path}/{task}"
         if is_train:
             td_task.set_annotated_file_path(f"{path}/annotate_{td_task.get_dataset_name()}_{task}_train_{split}.csv")
         else:
@@ -362,11 +376,21 @@ def evaluate():
     _client_payload = {}
     # End Form
     if task.lower() == "ra":
-        return jsonify({
-            "task": "Row Annotation",
-            "status": "succes",
-            "code": 200
-        })
+        _client_payload["submission_file_path"] = submition_path
+        aicrowd_evaluator = RA_Evaluator(target_path)  # ground truth
+        result = aicrowd_evaluator._evaluate(_client_payload)
+        try:
+            return jsonify({
+                "metric": result,
+                "task": "Column Property Annotation",
+                "status": "succes",
+                "code": 200
+            })
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "Error during the process:",
+            }), 400
     elif task.lower() == 'cpa':
         
         _client_payload["submission_file_path"] = submition_path
@@ -401,9 +425,37 @@ def evaluate():
                 "message": "Error during the process:",
             }), 400
     elif task.lower() == "cta":
-        return jsonify({"message": task}), 200
+        _client_payload["submission_file_path"] = submition_path
+        aicrowd_evaluator = CTA_Evaluator(target_path)  # ground truth
+        result = aicrowd_evaluator._evaluate_without_ancestor(_client_payload)
+        try:
+            return jsonify({
+                "metric": result,
+                "task": "Column Property Annotation",
+                "status": "succes",
+                "code": 200
+            })
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "Error during the process:",
+            }), 400
     elif task.lower() == "td":
-        return jsonify({"message": task}), 200
+        _client_payload["submission_file_path"] = submition_path
+        aicrowd_evaluator = TD_Evaluator(target_path)  # ground truth
+        result = aicrowd_evaluator._evaluate(_client_payload)
+        try:
+            return jsonify({
+                "metric": result,
+                "task": "Column Property Annotation",
+                "status": "succes",
+                "code": 200
+            })
+        except Exception as e:
+            print(e)
+            return jsonify({
+                "message": "Error during the process:",
+            }), 400
     else:
         return jsonify({"message": "task does not exist"}), 400
     
@@ -415,15 +467,16 @@ def parse_csv_to_json():
     csv_path = request.json.get('csv_path', "")
     is_entity = request.json.get('is_entity', "")
     comma_in_cell = request.json.get('comma_in_cell', "")
-    path = f"results/jsonl/{task}"
+    path = f"results/jsonl"
     # End Form
     if task.lower() == "ra":
         ra_task = RATask(
             dataset_name=dataset_name
         )
 
-        if not os.path.exists(path):
-            path = os.makedirs(path)
+        if not os.path.exists(f"{path}/{task}"):
+            os.makedirs(f"{path}/{task}")
+            path = f"{path}/{task}"
         
         try:
             ra_task._csv_to_jsonl(
@@ -446,8 +499,9 @@ def parse_csv_to_json():
             dataset_name=dataset_name
         )
 
-        if not os.path.exists(path):
-            path = os.makedirs(path)
+        if not os.path.exists(f"{path}/{task}"):
+            os.makedirs(f"{path}/{task}")
+            path = f"{path}/{task}"
         
         try:
             cpa_task._csv_to_jsonl(
@@ -469,8 +523,9 @@ def parse_csv_to_json():
             dataset_name=dataset_name
         )
 
-        if not os.path.exists(path):
-            path = os.makedirs(path)
+        if not os.path.exists(f"{path}/{task}"):
+            os.makedirs(f"{path}/{task}")
+            path = f"{path}/{task}"
         
         cea_task._csv_to_jsonl(
                 csv_path=csv_path,
@@ -494,8 +549,9 @@ def parse_csv_to_json():
             dataset_name=dataset_name
         )
 
-        if not os.path.exists(path):
-            path = os.makedirs(path)
+        if not os.path.exists(f"{path}/{task}"):
+            os.makedirs(f"{path}/{task}")
+            path = f"{path}/{task}"
         
         try:
             cta_task._csv_to_jsonl(
@@ -517,8 +573,9 @@ def parse_csv_to_json():
             dataset_name=dataset_name
         )
 
-        if not os.path.exists(path):
-            path = os.makedirs(path)
+        if not os.path.exists(f"{path}/{task}"):
+            os.makedirs(f"{path}/{task}")
+            path = f"{path}/{task}"
         
         try:
             td_task._csv_to_jsonl(

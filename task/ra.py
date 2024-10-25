@@ -284,45 +284,36 @@ class RATask:
             user_input = input('User: \n')
         conversation = [{"role": "user", "content": user_input}]
         
-        try:
-            prompt_length = len(user_input)
+        prompt_length = len(user_input)
             # check the total length contex
-            self.compute_max_token(prompt_length=prompt_length, max_new_token=max_tokens)
-            print(user_input)
-            message_input = conversation.copy()
-            prompt = [{"role": "system", "content": chatBot}]
-            message_input.insert(0, prompt[0])
-            completion = openai.chat.completions.create(
-                    model=model_id,
-                    temperature=temperature,
-                    frequency_penalty=frequency_penalty,
-                    top_p=1,
-                    presence_penalty=presence_penalty,
-                    seed=42,
-                    messages=message_input,
-                    max_tokens=max_tokens
-                )
-            
-            # Extract the chatbot response from API response
-            chat_response = completion.choices[0].message.content
+        self.compute_max_token(prompt_length=prompt_length, max_new_token=max_tokens)
+        print(user_input)
+        message_input = conversation.copy()
+        prompt = [{"role": "system", "content": chatBot}]
+        message_input.insert(0, prompt[0])
+        completion = openai.chat.completions.create(
+            model=model_id,
+            temperature=temperature,
+            frequency_penalty=frequency_penalty,
+            top_p=1,
+            presence_penalty=presence_penalty,
+            seed=42,
+            messages=message_input,
+            max_tokens=max_tokens
+        )
+        
+        chat_response = completion.choices[0].message.content
+        conversation.append({"role": "assistant", "content": chat_response})
+        # print(chat_response)
+        try:
                 
-            # Update conversation
-            conversation.append({"role": "assistant", "content": chat_response})
-            try:
-                
-                result = json.loads(chat_response)
-                label = result['recording']
-                uri = result['uri']
-                uri = uri.split(' ')[0]
-                print(f"The wikidata ofthis recording {label} is {uri}")
-            except:
-                uri = chat_response.split(":")[-1]
-                uri = "http:" + uri.split('"')[0]
-                uri = uri.split(' ')[0]
-                print(chat_response)
-                print(f"The wikidata of this recording is {uri}")
+            result = json.loads(chat_response)
+            uri = result['uri']
+            uri = uri.strip(' ')
         except:
-            uri = "NIL"
+            uri = chat_response.split(":")[-1]
+            uri = "http:" + uri.split('"')[0]
+            uri = uri.strip(' ')
         return uri
     
     
@@ -359,14 +350,14 @@ class RATask:
                             result = self.inference(model_id=model, user_input=user_input)                                 
                             # add result of annation   
                             data.append(result)
-                            updated_cea_data.append(data)
-                            i += 1  
-                                
+                            updated_cea_data.append(data)                              
                             #  write data in update cea file
                             writer.writerows(updated_cea_data)
                             print("*************************")
                             print(f"Row {i} annotated")
+                            print(f"The wikidata of this recording is {result}")
                             print("*************************")
+                            i += 1
                         
                         else:
                             print("it is not csv file")
@@ -382,7 +373,7 @@ class RATask:
                     i = split
                     for data in datas[split:]:
                         # print(data)
-                        updated_data = []   # at each iteration in reader_data, empty the list
+                        # updated_data = []   # at each iteration in reader_data, empty the list
                         label =  df['record'][i]     
         
                         user_input = f"Please Give the  wikidata URI of the this recording: {label}"                
@@ -390,13 +381,13 @@ class RATask:
                         result = self.inference(model_id=model, user_input=user_input)                                 
                         # add result of annation   
                         data.append(result)
-                        updated_data.extend([data[0], data[1], data[-1]])
+                        # updated_data.extend([data[0], data[1], data[-1]])
                         i += 1                              
                         #  write data in update cea file
-                        print(updated_data)
-                        writer.writerow(updated_data)
+                        writer.writerow([data[0], data[1], data[-1]])
                         print("*************************")
                         print(f"Row {i} annotated")
+                        print(f"The wikidata of this recording is {result}")
                         print("*************************")                
                     else:
                         print("it is not csv file")

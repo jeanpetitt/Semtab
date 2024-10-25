@@ -790,8 +790,8 @@ class CEATask:
                                 else:  
                                     # Use connectionist approach               
                                     user_input = f"Please what is wikidata URI of {label} entity.\nContext: {df['context'][i]}"            
-                                    if len(user_input) > 200:
-                                        user_input = f"Please what is wikidata URI of {label}"
+                                    # if len(user_input) > 200:
+                                    #     user_input = f"Please what is wikidata URI of {label}"
                                         # check uri
                                     result = self.inference(model_id=model, user_input=user_input)
                                     if result == "http:":
