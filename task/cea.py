@@ -677,7 +677,7 @@ class CEATask:
                     df = pd.read_csv(dataset_path) # open file with pandas
                     datas = df.values.tolist()
                     print(len(df))
-                    i = 0
+                    i = split
                     for data in datas[split:]:
                         updated_cea_data = []   # at each iteration in reader_data, empty the list
                         label =  df['label'][i]       
