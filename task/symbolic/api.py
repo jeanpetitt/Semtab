@@ -601,7 +601,6 @@ def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, 
                 claims = data["claims"]
                 entity_property_values = []
                 property_ids = []
-                property_values_label = []
 
                 for property_id, property_claims in claims.items():
                     i = 1
@@ -664,9 +663,9 @@ def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, 
                                             property_values[index] = value
                                             break
                 # print(entity_property_values)
-                property_values = is_subpart(property_values, entity_property_values) 
+                property_values_label = is_subpart(property_values, entity_property_values) 
                 converted_data = [frozenset(item.items()) if isinstance(item, dict) else item for item in entity_property_values]
-                if set(property_values).issubset(set(converted_data)):
+                if set(property_values_label).issubset(set(converted_data)) and property_values:
                     print("Yes")
                     # print(entity_property_values)
                     return entity_id
