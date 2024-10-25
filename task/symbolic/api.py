@@ -669,7 +669,7 @@ def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, 
 
         except:
             print("Not entity")
-    if len(entity_ids) != 0:
+    if len(entity_ids) != 0 and isinstance(entity_ids, list):
         return entity_ids[0]
     return None
 

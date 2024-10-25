@@ -760,9 +760,9 @@ class CEATask:
                                         entity_ids = openUrl(label, context[1:])
                                         if not entity_ids:
                                             label = self.correct_spelling(label)
-                                            entity_ids = openUrl(label)
+                                            entity_ids = openUrl(label, context[1:])
                                             if not entity_ids:
-                                                result = ''
+                                                result = 'NIL'
                                             elif len(entity_ids) == 1:
                                                 result = entity_ids[0]
                                             else:
