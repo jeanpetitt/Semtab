@@ -59,7 +59,7 @@ def openUrl(query, context=None, is_horizontal=True):
     output = []
     best_result = []
   
-    print(query)
+    # print(query)
     # try:
     response = requests.get(url, params=params)
     if "search" in response.json():
@@ -587,12 +587,13 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
 def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, label_current=None, context_have_string_value=False):
     if len(property_values) == 0:
         return entity_ids
-    property_values = property_values[1:]
+    # property_values = property_values[1:]
     if (len(entity_ids) <= 3 and len(entity_ids) != 0):
         return entity_ids[0]
     print(len(entity_ids))
 
     for entity_id in entity_ids:
+        # print(entity_ids)
         try:
             url = f"https://www.wikidata.org/w/api.php?action=wbgetclaims&entity={entity_id}&format=json"
             response = requests.get(url)
@@ -600,7 +601,9 @@ def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, 
             if "claims" in data:
                 claims = data["claims"]
                 entity_property_values = []
-                property_ids = []
+                
+                qids = []
+                qlabels = []
 
                 for property_id, property_claims in claims.items():
                     i = 1
@@ -611,8 +614,16 @@ def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, 
                                     # print(value['id'])
                                     result = get_entity_with_id(value['id'])
                                     label = result['label'] if 'label' in result else ''
-                                    if label in property_values:
+                                    idx = result['id'] if 'id' in result else ''
+                                    qids.append(idx)
+                                    qlabels.append(label)
+                                    if (label or idx) in property_values:
                                         entity_property_values.append(label)
+                                        if set(property_values).issubset(set(entity_property_values)):
+                                            if is_column_id:
+                                                return entity_id
+                                            else:
+                                                return idx
                                     else:
                                         continue
                                     if i == len(property_values):
@@ -662,11 +673,16 @@ def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, 
                                             index = property_values.index(item)
                                             property_values[index] = value
                                             break
-                # print(entity_property_values)
+                                entity_property_values.append(value)
+                # print(property_values)
                 property_values_label = is_subpart(property_values, entity_property_values) 
                 converted_data = [frozenset(item.items()) if isinstance(item, dict) else item for item in entity_property_values]
-                if set(property_values_label).issubset(set(converted_data)) and property_values:
+                if set(property_values_label).issubset(set(converted_data)) and property_values_label:
                     print("Yes")
+                    if not is_column_id:
+                        if label_current in qlabels:
+                            index = qlabels.index(label_current)
+                            return qids[index]
                     # print(entity_property_values)
                     return entity_id
 

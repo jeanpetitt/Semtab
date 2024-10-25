@@ -754,7 +754,7 @@ class CEATask:
                                                 continue
                                             context_have_string_value = True
                                             break                   
-                                    print(context)
+                                    # print(context)
                                     old_label = label
                                     if is_context:
                                         entity_ids = openUrl(label, context[1:])
@@ -767,18 +767,20 @@ class CEATask:
                                                 result = entity_ids[0]
                                             else:
                                                 old_entity_ids = entity_ids
-                                                if label not in context and label != old_label and old_label not in context:
-                                                    context = [label]
-                                                elif label not in context and label != old_label:
+                                                # if label not in context and label != old_label and old_label not in context:
+                                                #     context = [label]
+                                                if label not in context and label != old_label:
                                                     index = context.index(old_label)
                                                     context[index] = label
                                                 if context.index(label) != 0:
                                                     entity_ids = openUrl(context[0], context[1:])
                                                     if not entity_ids:
-                                                        label = self.correct_spelling(context[0])
-                                                        entity_ids = openUrl(label, context[1:])
+                                                        identifier = self.correct_spelling(context[0])
+                                                        entity_ids = openUrl(identifier, context[1:])
+                                                    print("context", context[1:])
                                                     result = check_entity_properties_cea(entity_ids, context[1:], False, label, context_have_string_value)
                                                 else:
+                                                    print("context", context[1:])
                                                     result = check_entity_properties_cea(entity_ids, context[1:], context_have_string_value=context_have_string_value)
                                                 if not result:
                                                     result = old_entity_ids[0]
@@ -794,8 +796,8 @@ class CEATask:
                                                 if context.index(label) != 0:
                                                     entity_ids = openUrl(context[0], context[1:])
                                                     if not entity_ids:
-                                                        label = self.correct_spelling(context[0])
-                                                        entity_ids = openUrl(label, context[1:])
+                                                        identifier = self.correct_spelling(context[0])
+                                                        entity_ids = openUrl(identifier, context[1:])
                                                     result = check_entity_properties_cea(entity_ids, context[1:], False, label, context_have_string_value)
                                                 else:
                                                     result = check_entity_properties_cea(entity_ids, context[1:], context_have_string_value=context_have_string_value)
