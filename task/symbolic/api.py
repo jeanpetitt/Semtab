@@ -581,9 +581,11 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
     return None   
 
 def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, label_current=None, context_have_string_value=False):
-    if len(property_values) <= 3:
-        return entity_ids[0]
+    if len(property_values) == 0:
+        return entity_ids
     property_values = property_values[1:]
+    if (len(entity_ids) <= 3 and len(entity_ids) != 0):
+        return entity_ids[0]
     print(len(entity_ids))
 
     for entity_id in entity_ids:

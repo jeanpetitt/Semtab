@@ -805,7 +805,7 @@ class CEATask:
                                         result = self.inference(model_id=model, user_input=user_input)
                             
                         data.append(result)
-                        print(data)
+                        # print(data)
                         updated_cea_data.extend([data[0], data[1], data[2], data[-1]])
                         i += 1  
                                 
