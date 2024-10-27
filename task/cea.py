@@ -1,4 +1,4 @@
-from .symbolic.api import openUrl, check_entity_properties_cea
+from .symbolic.api import openUrl, check_entity_properties_cea, FlexibleValue
 from .helper import getNameCsvFile, getAllCellInTableColByBCol, getAllCellInTableRowByRow, tableToVectROw, tableToVectCol
 import random
 import csv
@@ -777,10 +777,10 @@ class CEATask:
                                                     if not entity_ids:
                                                         identifier = self.correct_spelling(context[0])
                                                         entity_ids = openUrl(identifier, context[1:])
-                                                    print("context", context[1:])
+                                                    print("context", context)
                                                     result = check_entity_properties_cea(entity_ids, context[1:], False, label, context_have_string_value)
                                                 else:
-                                                    print("context", context[1:])
+                                                    print("context", context)
                                                     result = check_entity_properties_cea(entity_ids, context[1:], context_have_string_value=context_have_string_value)
                                                 if not result:
                                                     result = old_entity_ids[0]
@@ -789,12 +789,29 @@ class CEATask:
                                                 result = entity_ids[0]
                                             else:
                                                 old_entity_ids = entity_ids
-                                                if label not in context:
-                                                    first_elt = context[0]
-                                                    context.pop()
-                                                    context.extend([label, first_elt])
-                                                if context.index(label) != 0:
+                                                # if label not in context:
+                                                #     first_elt = context[0]
+                                                #     context.pop()
+                                                #     context.extend([label, first_elt])
+                                                label_flex = FlexibleValue(label)
+                                                first_elt = context[0]
+                                                j = 1
+                                                # temp = first_elt
+                                                index1 = context.index(FlexibleValue(first_elt))
+                                                old_context = context
+                                                while is_number(first_elt) and j < len(context):
+                                                    next_element = context[j]
+                                                    index2 = context.index(FlexibleValue(next_element))
+                                                    # first_elt = nex_element
+                                                    if not is_number(str(next_element)) and not is_date(str(next_element)):
+                                                        # swap position of element
+                                                        context[index1], context[index2] = context[index2], context[index1]
+                                                        # print("Yes and true")
+                                                        break
+                                                    j += 1
+                                                if context.index(label_flex) != 0:
                                                     entity_ids = openUrl(context[0], context[1:])
+                                                    print("yes")
                                                     if not entity_ids:
                                                         identifier = self.correct_spelling(context[0])
                                                         entity_ids = openUrl(identifier, context[1:])
@@ -808,7 +825,7 @@ class CEATask:
                                         result = openUrl(label)                       
                                 else:  
                                     # Use connectionist approach               
-                                    user_input = f"Please what is wikidata URI of {label} entity.\nContext: {df['context'][i]}"            
+                                    user_input = f"Please what is wikidata URI of {label}.\nContext: {df['context'][i]}"            
                                     # if len(user_input) > 200:
                                     #     user_input = f"Please what is wikidata URI of {label}"
                                         # check uri

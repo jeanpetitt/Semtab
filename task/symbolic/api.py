@@ -585,10 +585,10 @@ def check_entity_properties_cpa(entity_ids, property_values, is_horizontal=False
     return None   
 
 def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, label_current=None, context_have_string_value=False):
-    if len(property_values) == 0:
+    if len(property_values) == 0 and not label_current:
         return entity_ids
     # property_values = property_values[1:]
-    if (len(entity_ids) <= 3 and len(entity_ids) != 0):
+    if (len(entity_ids) <= 3 and len(entity_ids) != 0) and not label_current:
         return entity_ids[0]
     print(len(entity_ids))
 
@@ -617,9 +617,16 @@ def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, 
                                     idx = result['id'] if 'id' in result else ''
                                     qids.append(idx)
                                     qlabels.append(label)
-                                    if (label or idx) in property_values:
-                                        entity_property_values.append(label)
-                                        if set(property_values).issubset(set(entity_property_values)):
+                                    if (FlexibleValue(label) or FlexibleValue(idx)) in property_values:
+                                        entity_property_values.append(label) if label else  entity_property_values.append(idx)
+                                        is_match = False
+                                        for prop in property_values:
+                                            if FlexibleValue(prop) in entity_property_values:
+                                                is_match = True
+                                            else:
+                                                is_match = False
+                                                break
+                                        if is_match:
                                             if is_column_id:
                                                 return entity_id
                                             else:
@@ -688,7 +695,7 @@ def check_entity_properties_cea(entity_ids, property_values, is_column_id=True, 
 
         except:
             print("Not entity")
-    if len(entity_ids) != 0:
+    if len(entity_ids) != 0 and is_column_id:
         return entity_ids[0]
 
     return None
